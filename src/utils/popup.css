@@ -1,0 +1,11 @@
+.custom-swal-container {
+  width: 100vw; /* Set responsive width (50% of viewport width) */
+  height: 100vh; /* Set responsive height (50% of viewport height) */
+  max-width: 100%; /* Optional: Cap the max width at 90% of screen width */
+  max-height: 100%; /* Optional: Cap the max height at 90% of screen height */
+  display: flex; /* Ensure content is centered */
+  align-items: center; /* Vertically center content */
+  justify-content: center; /* Horizontally center content */
+  overflow: hidden;
+  background-color: rgba(247, 248, 248, 0.3);
+}
