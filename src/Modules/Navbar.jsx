@@ -136,10 +136,10 @@ const NavbarModule = ({ toggleSidebar, showSidebar }) => {
                   pathname.startsWith("/profile") ? "active-nav" : ""
                 }`}
               >
-                {userData.userImage ? (
+                {userData?.userImage ? (
                   <img
                     style={{ width: "100%", borderRadius: "50%" }}
-                    src={userData.userImage}
+                    src={userData?.userImage}
                     alt="profile"
                   />
                 ) : (

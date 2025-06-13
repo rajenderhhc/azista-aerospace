@@ -12,7 +12,7 @@ const StationDropdown = (props) => {
   } = props;
 
   const options = profileStations.map((s) => ({
-    value: s.stationId,
+    value: s._id,
     label: `${s.stationId}-${s.stationName}`,
   }));
 

@@ -41,34 +41,51 @@ h6 {
   position: relative;
 }
 
+/* Sidebar: visible state */
 .displaySidebar {
   background-color: #f8f8f8;
-  width: 18% !important;
+  width: 18%;
   height: 100vh;
+  position: fixed;
   top: 0;
+  bottom: 0;
   left: 0;
   padding: 0.5rem;
   border-right: 1.4px solid rgba(235, 235, 235, 1);
   overflow: visible;
-  transition: width 1s ease;
+  transition: transform 0.5s ease-in-out;
+  transform: translateX(0);
+  z-index: 999;
 }
 
-.hideSidebar {
-  display: none;
+/* Sidebar: hidden state */
+.displaySidebar.hideSidebar {
+  transform: translateX(-100%);
 }
 
+/* Main content */
 .mainCont {
   background-color: #ffffff;
   height: 100vh;
   width: 82%;
   overflow-y: auto;
   overflow-x: hidden;
-  transition: width 0.5s ease; /* only width, for smoothness */
+  transition: width 0.5s ease-in-out, margin-left 0.5s ease-in-out;
   padding: 0.5rem 0.8rem 0 0.8rem;
+  margin-left: 18%; /* ensures it doesn't go under the sidebar */
 }
 
+/* Main content expands when sidebar is hidden */
 .mainCont.fullWidth {
   width: 100%;
+  margin-left: 0;
+}
+
+.outlet-container {
+  height: 88%;
+  margin-top: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* navbar */

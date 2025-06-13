@@ -124,6 +124,7 @@ const Reports = () => {
       const { data } = await axios.post(url, formdata, {
         headers,
       });
+
       if (data.statusCode === 200) {
         setReportsData(data.result);
 
