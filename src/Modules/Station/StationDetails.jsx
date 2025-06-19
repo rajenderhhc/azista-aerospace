@@ -15,6 +15,7 @@ import SelectDateRange from "../../components/SelectDateRange";
 import moment from "moment";
 import axios from "axios";
 import DataTable from "./DataTable";
+import CustomOverviewTable from "./CustormOverviewTable";
 
 dayjs.extend(customParseFormat);
 
@@ -191,12 +192,34 @@ const StationDetails = () => {
   };
 
   const summaryHeaders = ["Statistical Metrics", ...sensorKeys(summaryData)];
-  const overViewHeaders = [
-    "Statistical Metrics",
-    "Date",
-    ...sensorKeys(overviewData),
-  ];
   const datalistHeaders = ["Date", "Time", ...sensorKeys(detailedData)];
+  const overViewHeaders = [...sensorKeys(overviewData)];
+
+  const formatDataByDate = (data) => {
+    const grouped = {};
+
+    data.forEach((item) => {
+      const date = item.date;
+      if (!grouped[date]) grouped[date] = {};
+      grouped[date][item.title] = item.sensorDataList;
+    });
+
+    return Object.entries(grouped).map(([date, titles]) => {
+      const row = { date };
+
+      overViewHeaders.forEach((header) => {
+        row[header] = {
+          High: titles["High"]?.[header] ?? "N/A",
+          Low: titles["Low"]?.[header] ?? "N/A",
+          Average: titles["Average"]?.[header] ?? "N/A",
+        };
+      });
+
+      return row;
+    });
+  };
+
+  const fomatedOverivewData = formatDataByDate(overviewData);
 
   return (
     <div className="mainContInfo">
@@ -247,8 +270,8 @@ const StationDetails = () => {
             title={"Summary"}
           />
           {selectDateType === "custom" ? (
-            <DataTable
-              data={overviewData}
+            <CustomOverviewTable
+              data={fomatedOverivewData}
               headers={overViewHeaders}
               SelectDate={SelectDate}
               selectDateType={selectDateType}

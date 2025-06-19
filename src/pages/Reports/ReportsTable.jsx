@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { LuFileDown } from 'react-icons/lu';
-import './reports.css';
+import React, { useState } from "react";
+import { LuFileDown } from "react-icons/lu";
+import "./reports.css";
 
 const WeatherTable = ({ data, fileName }) => {
   const [rowsChecked, setRowsChecked] = useState(false);
@@ -13,7 +13,7 @@ const WeatherTable = ({ data, fileName }) => {
   const sensorNames = Array.from(
     new Set(data.flatMap((entry) => Object.keys(entry.rowData || {})))
   );
-  const headers = ['Time', 'StationId', ...sensorNames];
+  const headers = ["Time", "StationId", ...sensorNames];
 
   const downloadCSV = () => {
     const selectedRows = rows.filter((row) => row.isChecked);
@@ -22,24 +22,26 @@ const WeatherTable = ({ data, fileName }) => {
     if (exportData.length === 0) return;
 
     const csvContent = [
-      headers.join(','),
+      headers.join(","),
       ...exportData.map((item) =>
         headers
           .map((key) => {
-            if (key === 'Time') {
-              return item['dateTime'];
-            } else if (key === 'StationId') {
-              return item['stationId'];
+            if (key === "Time") {
+              return item["dateTime"];
+            } else if (key === "StationId") {
+              return item["stationId"];
             } else {
-              return item?.rowData?.[key] || 'N/A';
+              return item?.rowData?.[key] || "N/A";
             }
           })
-          .join(',')
+          .join(",")
       ),
-    ].join('\n');
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = fileName;
     document.body.appendChild(link);
@@ -64,32 +66,34 @@ const WeatherTable = ({ data, fileName }) => {
 
   return (
     <>
-      <div className='d-flex mb-2 justify-content-between align-items-center'>
+      <div className="d-flex mb-2 justify-content-between align-items-center">
         <div>
           <span>Showing {data.length} Records</span>
         </div>
         <button
-          className='btn btn-primary ms-4'
+          className="btn btn-primary ms-4"
           disabled={data.length === 0}
-          onClick={downloadCSV}>
+          onClick={downloadCSV}
+        >
           Download Report <LuFileDown />
         </button>
       </div>
-      <div className='report-table-container'>
+      <div className="report-table-container">
         <table
-          className='min-w-full border border-gray-300 report-table'
-          style={{ minWidth: '100%' }}>
-          <thead className='reports-header'>
-            <tr className='bg-gray-200'>
-              <th className='border p-2'>
+          className="min-w-full border border-gray-300 report-table"
+          style={{ minWidth: "100%" }}
+        >
+          <thead className="reports-header">
+            <tr className="bg-gray-200">
+              <th className="border p-2">
                 <input
-                  type='checkbox'
+                  type="checkbox"
                   checked={rowsChecked}
                   onChange={onChangeRowsSelected}
                 />
               </th>
               {headers.map((header) => (
-                <th key={header} className='border p-2 text-left'>
+                <th key={header} className="border p-2 text-left">
                   {header}
                 </th>
               ))}
@@ -97,19 +101,19 @@ const WeatherTable = ({ data, fileName }) => {
           </thead>
           <tbody>
             {rows.map((entry, index) => (
-              <tr key={index} className='border'>
-                <td className='border p-2'>
+              <tr key={index} className="border">
+                <td className="border p-2">
                   <input
-                    type='checkbox'
+                    type="checkbox"
                     checked={entry.isChecked}
                     onChange={(e) => onChangeSingleRowSelected(e, index)}
                   />
                 </td>
-                <td className='border p-2'>{entry.dateTime}</td>
-                <td className='border p-2'>{entry.stationId}</td>
+                <td className="border p-2">{entry.dateTime}</td>
+                <td className="border p-2">{entry.stationId}</td>
                 {sensorNames.map((sensor) => (
-                  <td key={sensor} className='border p-2'>
-                    {entry.rowData?.[sensor] || 'N/A'}
+                  <td key={sensor} className="border p-2">
+                    {entry.rowData?.[sensor] || "N/A"}
                   </td>
                 ))}
               </tr>

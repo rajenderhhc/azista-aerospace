@@ -72,20 +72,13 @@ h6 {
   overflow-x: hidden;
   transition: width 0.5s ease-in-out, margin-left 0.5s ease-in-out;
   padding: 0.5rem 0.8rem 0 0.8rem;
-  margin-left: 18%; /* ensures it doesn't go under the sidebar */
+  margin-left: 18%;
 }
 
 /* Main content expands when sidebar is hidden */
 .mainCont.fullWidth {
   width: 100%;
   margin-left: 0;
-}
-
-.outlet-container {
-  height: 88%;
-  margin-top: 1rem;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 /* navbar */

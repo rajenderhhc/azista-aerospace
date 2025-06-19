@@ -227,11 +227,19 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
             >
               <button
                 onClick={() => toggleDropdown(each.profileID)}
-                className="customDropdown"
+                className="customDropdown d-flex"
               >
-                <img src={locationIcon} alt="location" className="nav-icons" />
-                {each.profileName}
-                <span className="profile-count">{each.totalStations}</span>
+                <div className="w-75 d-flex justify-content-between align-items-center">
+                  <div>
+                    <img
+                      src={locationIcon}
+                      alt="location"
+                      className="nav-icons"
+                    />
+                    {each.profileName}
+                  </div>
+                  <span className="profile-count">{each.totalStations}</span>
+                </div>
 
                 {openDropdown === each.profileID ? (
                   <MdKeyboardArrowUp className="d-block" size={18} />
