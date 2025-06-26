@@ -27,9 +27,16 @@
 }
 
 .report-table-container {
-  height: 50vh;
+  height: 55vh;
   overflow: auto;
   white-space: nowrap;
+}
+
+/* Apply this on mobile screens (<= 765px width) */
+@media screen and (max-width: 764px) {
+  .report-table-container {
+    height: 35vh;
+  }
 }
 
 /* Make the header sticky */

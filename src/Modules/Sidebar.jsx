@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import ErrorHandler from "../utils/errorhandler";
@@ -18,7 +18,13 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
   const token_key = process.env.REACT_APP_JWT_TOKEN;
   const admin_key = process.env.REACT_APP_ADMIN_KEY;
 
-  const userData = JSON.parse(localStorage.getItem(admin_key));
+  const userData = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem(admin_key)) || {};
+    } catch {
+      return {};
+    }
+  }, [admin_key]);
   const { profileDetailsList = [] } = userData || {};
 
   const [profileStations, setProfileStations] = useState([]);
@@ -111,6 +117,70 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
     }, []);
   };
 
+  const renderDropdownItem = (profile, isSearch = false) => {
+    const {
+      profileName = "",
+      profileID = "",
+      totalStations = 0,
+      stations = [],
+    } = profile;
+
+    const isOpen = isSearch
+      ? openSearchDropdown === profileName
+      : openDropdown === profileID;
+
+    const stationsList = isSearch ? stations : profileStations;
+    const stationCount = isSearch ? stations.length : totalStations;
+
+    const handleProfileClick = () => {
+      if (isSearch) {
+        setOpenSearchDropdown(isOpen ? "" : profileName);
+      } else {
+        toggleDropdown(profileID);
+      }
+    };
+
+    return (
+      <li
+        key={profileID}
+        className={`nav-item ${
+          !isSearch && isOpen ? "active-profile-view" : ""
+        }`}
+      >
+        <button onClick={handleProfileClick} className="customDropdown d-flex">
+          <div className="w-75 d-flex justify-content-between align-items-center">
+            <div>
+              <img src={locationIcon} alt="location" className="nav-icons" />
+              {profileName}
+            </div>
+            <span className="profile-count">{stationCount}</span>
+          </div>
+          {isOpen ? (
+            <MdKeyboardArrowUp className="d-block" size={18} />
+          ) : (
+            <MdOutlineKeyboardArrowDown className="d-block" size={18} />
+          )}
+        </button>
+
+        {isOpen && (
+          <div className="subDropdown mt-2 p-2">
+            {loading ? (
+              <div className="text-center">
+                <ThreeDot color="#f58142" size="small" />
+              </div>
+            ) : stationsList.length > 0 ? (
+              <StationOverView stations={stationsList} activeEffect={true} />
+            ) : (
+              <div className="text-center">
+                <span className="text-danger">No Data found</span>
+              </div>
+            )}
+          </div>
+        )}
+      </li>
+    );
+  };
+
   return (
     <>
       <div className="close-icon d-md-none">
@@ -150,120 +220,29 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
             </span>
           </div>
 
-          <div className="subDropdown mt-2 p-1">
+          <div
+            className={`subDropdown mt-2 p-1 ${loading ? "text-center" : ""}`}
+          >
             {loading ? (
-              <ThreeDot color="#f58142" size="small" />
+              <div className="text-center">
+                <ThreeDot color="#f58142" size="small" />
+              </div>
             ) : searchResult.length > 0 ? (
               <ul className="nav-items search-Nav-Items">
-                {groupByProfileName(searchResult).map((each) => (
-                  <li
-                    key={each.profileName}
-                    className={`nav-item ${
-                      openSearchDropdown === each.profileName
-                        ? "active-profile-view"
-                        : ""
-                    }`}
-                  >
-                    <button
-                      onClick={() =>
-                        setOpenSearchDropdown(
-                          openSearchDropdown === each.profileName
-                            ? ""
-                            : each.profileName
-                        )
-                      }
-                      className="customDropdown"
-                    >
-                      <img
-                        src={locationIcon}
-                        alt="location"
-                        className="nav-icons"
-                      />
-                      {each.profileName}
-
-                      <span className="profile-count">
-                        {each.stations?.length}
-                      </span>
-                      {openSearchDropdown === each.profileName ? (
-                        <MdKeyboardArrowUp className="d-block" size={18} />
-                      ) : (
-                        <MdOutlineKeyboardArrowDown
-                          className="d-block"
-                          size={18}
-                        />
-                      )}
-                    </button>
-
-                    {openSearchDropdown === each.profileName && (
-                      <div className="subDropdown mt-2 p-2">
-                        {loading ? (
-                          <ThreeDot color="#f58142" size="small" />
-                        ) : each.stations.length > 0 ? (
-                          <StationOverView
-                            stations={each.stations}
-                            activeEffect={true}
-                          />
-                        ) : (
-                          <span className="text-danger">No Data found</span>
-                        )}
-                      </div>
-                    )}
-                  </li>
-                ))}
+                {groupByProfileName(searchResult).map((each) =>
+                  renderDropdownItem(each, true)
+                )}
               </ul>
             ) : (
-              <span className="text-danger">No Data found</span>
+              <div className="text-center">
+                <span className="text-danger">No Data found</span>
+              </div>
             )}
           </div>
         </>
       ) : (
         <ul className="nav-items">
-          {ProfileDetailsList.map((each) => (
-            <li
-              key={each.profileID}
-              className={`nav-item ${
-                openDropdown === each.profileID ? "active-profile-view" : ""
-              }`}
-            >
-              <button
-                onClick={() => toggleDropdown(each.profileID)}
-                className="customDropdown d-flex"
-              >
-                <div className="w-75 d-flex justify-content-between align-items-center">
-                  <div>
-                    <img
-                      src={locationIcon}
-                      alt="location"
-                      className="nav-icons"
-                    />
-                    {each.profileName}
-                  </div>
-                  <span className="profile-count">{each.totalStations}</span>
-                </div>
-
-                {openDropdown === each.profileID ? (
-                  <MdKeyboardArrowUp className="d-block" size={18} />
-                ) : (
-                  <MdOutlineKeyboardArrowDown className="d-block" size={18} />
-                )}
-              </button>
-
-              {openDropdown === each.profileID && (
-                <div className="subDropdown mt-2 p-2">
-                  {loading ? (
-                    <ThreeDot color="#f58142" size="small" />
-                  ) : profileStations.length > 0 ? (
-                    <StationOverView
-                      stations={profileStations}
-                      activeEffect={true}
-                    />
-                  ) : (
-                    <span className="text-danger">No Data found</span>
-                  )}
-                </div>
-              )}
-            </li>
-          ))}
+          {ProfileDetailsList.map((each) => renderDropdownItem(each))}
         </ul>
       )}
     </>

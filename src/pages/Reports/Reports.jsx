@@ -12,6 +12,7 @@ import { ThreeDot } from "react-loading-indicators";
 import ProfileDropdown from "./ProfilesDrop";
 import StationDropdown from "./SatationDrop";
 import WeatherTable from "./ReportsTable";
+import ReportTypeDrop from "./ReportTypeDrop";
 
 const Reports = () => {
   const userData = JSON.parse(
@@ -19,7 +20,7 @@ const Reports = () => {
   );
 
   let { profileDetailsList } = userData;
-
+  const [reportType, setReportType] = useState("gn");
   const [reportsData, setReportsData] = useState([]);
   const [selectDateType, setSelectedDateType] = useState("today");
   const [dateRange, setDateRange] = useState([
@@ -149,18 +150,26 @@ const Reports = () => {
     }
   };
 
+  console.log(reportsData, "reportsDatas");
+
   return (
     <div className="mainContInfo">
       <h5 className="report-title">Reports</h5>
       <div className="row inputs-containr_header">
-        <div className="col-12 col-md-3">
+        <div className="col-12 col-md-3 my-2">
+          <ReportTypeDrop
+            reportType={reportType}
+            setReportType={setReportType}
+          />
+        </div>
+        <div className="col-12 col-md-3 my-2">
           <ProfileDropdown
             selectedProfile={selectedProfile}
             onChangeProfile={onChangeProfile}
             profileDetailsList={profileDetailsList}
           />
         </div>
-        <div className="col-12 col-md-4">
+        <div className="col-12 col-md-3 my-2">
           <StationDropdown
             selectedStations={selectedStations}
             setSelectedStations={setSelectedStations}
@@ -169,7 +178,11 @@ const Reports = () => {
             setStationError={setStationError}
           />
         </div>
-        <div className="col-12 col-md-5">
+        <div
+          className={`col-12 ${
+            selectDateType === "custom" ? "col-md-4" : "col-md-3"
+          }`}
+        >
           <label className="label-primary" htmlFor="dateSelect">
             Select Date *
           </label>
@@ -180,28 +193,29 @@ const Reports = () => {
           />
           <span style={{ display: "none" }}>data required</span>
         </div>
-      </div>
-      <div className="text-center my-2">
-        <button className="btn btn-primary " onClick={getReportsData}>
-          Generate Report
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="text-center">
-          <ThreeDot color="#f58142" size="small" />
+        <div className="col-12 col-md-2 mt-4">
+          <button className="btn btn-primary" onClick={getReportsData}>
+            Generate Report
+          </button>
         </div>
-      ) : reportsData?.length > 0 ? (
-        <WeatherTable data={reportsData} fileName={fileName} />
-      ) : (
-        <div className="text-center h-50">
-          {showNodata && (
-            <div className="my-3">
-              <span className="text-danger text-center">No Data found</span>
-            </div>
-          )}
-        </div>
-      )}
+      </div>
+      <div className="mt-2">
+        {loading ? (
+          <div className="text-center h-50 ">
+            <ThreeDot color="#f58142" size="small" />
+          </div>
+        ) : reportsData?.length > 0 ? (
+          <WeatherTable data={reportsData} fileName={fileName} />
+        ) : (
+          <div className="text-center h-50">
+            {showNodata && (
+              <div className="my-3">
+                <span className="text-danger text-center">No Data found</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

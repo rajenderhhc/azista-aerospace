@@ -49,7 +49,7 @@ const Home = () => {
       {locations.length > 0 ? (
         <MapEmbed
           locations={locations}
-          height={"75vh"}
+          height={"85vh"}
           Zoom={10}
           viewSummary={true}
         />

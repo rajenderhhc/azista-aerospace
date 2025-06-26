@@ -222,7 +222,7 @@ const StationDetails = () => {
   const fomatedOverivewData = formatDataByDate(overviewData);
 
   return (
-    <div className="mainContInfo">
+    <div className="mainContInfo mb-5">
       <StationView stationData={stationData} district={district} />
       <div className="d-flex justify-content-between align-items-center mt-4">
         <div className="left-sec">

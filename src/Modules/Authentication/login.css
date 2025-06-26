@@ -9,7 +9,7 @@
 } */
 
 .bg-image {
-  background-image: url('../../images/login-background.png');
+  background-image: url("../../images/login-backgorund-1.png");
   background-repeat: no-repeat;
   height: 100vh;
   background-size: cover;
@@ -20,7 +20,7 @@
 }
 
 .bg-image::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -43,7 +43,7 @@
   flex-direction: column;
   align-items: center;
   color: #ffffff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: "Urbanist", sans-serif;
   margin-bottom: 1rem;
 }
 

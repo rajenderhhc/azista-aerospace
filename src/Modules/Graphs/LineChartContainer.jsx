@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -10,20 +10,20 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 import {
   getDummySensorData,
   getSensorColor,
-} from '../../utils/sensorsFormater';
+} from "../../utils/sensorsFormater";
 
-import '../dashboard.css';
+import "../dashboard.css";
 
 const LineChartContainer = (props) => {
   const {
     data,
     sensorName,
     sensorUnits,
-    iconType = 'circle',
+    iconType = "circle",
     selectDateType,
     zoomFactor,
   } = props;
@@ -70,74 +70,76 @@ const LineChartContainer = (props) => {
     const container = chartContainerRef.current;
     if (!container) return;
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
   }, [startIndex, windowSize, data.length]);
 
   return (
-    <div className='chart-wrapper' style={{ paddingLeft: '10px' }}>
+    <div className="chart-wrapper" style={{ paddingLeft: "10px" }}>
       <div
-        className='chart-inner'
+        className="chart-inner"
         style={{
           width: `${Math.max(500 * zoomFactor, 760)}px`,
-        }}>
-        <ResponsiveContainer width='100%' height={300}>
+        }}
+      >
+        <ResponsiveContainer width="100%" height={300}>
           <LineChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
-            <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='time' tick={{ fontSize: 12, marginLeft: 200 }} />
+            margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="time" tick={{ fontSize: 12, marginLeft: 200 }} />
             <YAxis
               label={{
                 value: `${sensorName}`,
                 angle: -90,
-                position: 'insideLeft',
-                dy: '50%',
-                dx: -20,
-                style: { textAnchor: 'middle' },
+                position: "insideLeft",
+                dy: "50%",
+                dx: -15,
+                style: { textAnchor: "middle" },
               }}
               tickFormatter={(value) =>
-                `${value} ${sensorUnits[sensorName] || ''}`
+                `${value} ${sensorUnits[sensorName] || ""}`
               }
               tick={{ fontSize: 12 }}
             />
             <Tooltip
-              formatter={(value) => `${value} ${sensorUnits[sensorName] || ''}`}
+              formatter={(value) => `${value} ${sensorUnits[sensorName] || ""}`}
             />
-            <Legend verticalAlign='bottom' align='center' iconType={iconType} />
-            {selectDateType === 'custom' && (
+            <Legend verticalAlign="bottom" align="center" iconType={iconType} />
+            {selectDateType === "custom" && (
               <Line
-                type='monotone'
-                dataKey='low'
-                stroke='#007bff'
+                type="monotone"
+                dataKey="low"
+                stroke="#007bff"
                 dot={{ r: 5 }}
                 strokeWidth={2}
               />
             )}
-            {selectDateType === 'custom' && (
+            {selectDateType === "custom" && (
               <Line
-                type='monotone'
-                dataKey='high'
-                stroke='#ff4d4d'
+                type="monotone"
+                dataKey="high"
+                stroke="#ff4d4d"
                 dot={{ r: 5 }}
                 strokeWidth={2}
               />
             )}
-            {selectDateType === 'custom' && (
+            {selectDateType === "custom" && (
               <Line
-                type='monotone'
-                dataKey='avg'
-                stroke='#4CAF50'
+                type="monotone"
+                dataKey="avg"
+                stroke="#4CAF50"
                 dot={{ r: 5 }}
                 strokeWidth={2}
               />
             )}
-            {selectDateType !== 'custom' && (
+            {selectDateType !== "custom" && (
               <Line
-                type='monotone'
-                dataKey='current'
+                type="monotone"
+                dataKey="current"
                 name={sensorName}
-                stroke={getSensorColor(sensorName) || '#4CAF50'}
+                stroke={getSensorColor(sensorName) || "#4CAF50"}
                 dot={{ r: 5 }}
                 strokeWidth={2}
               />

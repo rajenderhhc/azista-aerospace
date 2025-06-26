@@ -174,29 +174,15 @@ const MultiLineChart = () => {
           padding: "10px",
         }}
       >
-        <div style={{ width: Math.max(chartData.length * zoomFactor, 1000) }}>
-          {/* <ResponsiveContainer width='100%' height={400}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='datetime' />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              {sensorNames.map((sensor) => (
-                <Line
-                  key={sensor}
-                  type='monotone'
-                  dataKey={sensor}
-                  stroke={getSensorColor(sensor)}
-                  dot={false}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer> */}
-          <ResponsiveContainer width="100%" height={450}>
+        <div
+          style={{
+            width: `max(99%, ${chartData.length * zoomFactor}px)`,
+          }}
+        >
+          <ResponsiveContainer height={450}>
             <LineChart
               data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+              margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
               <XAxis

@@ -16,7 +16,7 @@ const MainLayout = () => {
           showSidebar ? "displaySidebar" : "displaySidebar hideSidebar"
         }
       >
-        <Sidebar />
+        <Sidebar showSidebar={showSidebar} toggleSidebar={toggleSidebar} />
       </section>
       <section className={`mainCont ${showSidebar ? "" : "fullWidth"}`}>
         <Navbar showSidebar={showSidebar} toggleSidebar={toggleSidebar} />
