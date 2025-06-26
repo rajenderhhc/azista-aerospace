@@ -13,6 +13,7 @@ import ProfileDropdown from "./ProfilesDrop";
 import StationDropdown from "./SatationDrop";
 import WeatherTable from "./ReportsTable";
 import ReportTypeDrop from "./ReportTypeDrop";
+import WaterLevelReport from "./WaterLevelReport";
 
 const Reports = () => {
   const userData = JSON.parse(
@@ -100,7 +101,7 @@ const Reports = () => {
     }
   };
 
-  const getReportsData = async () => {
+  const getGeneralReportsData = async () => {
     const ids = selectedStations.map((opt) => opt.value).join(",");
     const { formDate, toDate } = getDatebyInputChange();
     if (!selectedStations.length) {
@@ -150,25 +151,55 @@ const Reports = () => {
     }
   };
 
-  console.log(reportsData, "reportsDatas");
+  const waterLevel = async () => {
+    try {
+      setLoading(true);
+      setShowNodata(true);
 
-  return (
-    <div className="mainContInfo">
-      <h5 className="report-title">Reports</h5>
-      <div className="row inputs-containr_header">
-        <div className="col-12 col-md-3 my-2">
-          <ReportTypeDrop
-            reportType={reportType}
-            setReportType={setReportType}
-          />
-        </div>
+      const formdata = new FormData();
+
+      formdata.append("profileId", selectedProfile);
+
+      const url = `${baseUrl}/Report/Report/WaterLevelSummaryReport`;
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const { data } = await axios.post(url, formdata, {
+        headers,
+      });
+
+      console.log(data);
+
+      if (data.statusCode === 200) {
+        setReportsData(data.result);
+
+        const profile = profileDetailsList.find(
+          (p) => p.profileID === selectedProfile
+        );
+
+        const filename = `${profile?.profileID}-WaterLevelSummaryReport.csv`;
+
+        setFileName(filename);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        ErrorHandler.onError({ message: data.message || "Unknown error" });
+      }
+    } catch (error) {
+      setLoading(false);
+      ErrorHandler.onError(error);
+    }
+  };
+
+  const GeneralFilters = () => {
+    return (
+      <>
         <div className="col-12 col-md-3 my-2">
           <ProfileDropdown
             selectedProfile={selectedProfile}
             onChangeProfile={onChangeProfile}
             profileDetailsList={profileDetailsList}
           />
-        </div>
+        </div>{" "}
         <div className="col-12 col-md-3 my-2">
           <StationDropdown
             selectedStations={selectedStations}
@@ -191,8 +222,64 @@ const Reports = () => {
             setSelectedDateType={setSelectedDateType}
             selectDateType={selectDateType}
           />
-          <span style={{ display: "none" }}>data required</span>
+          <span style={{ display: "none" }}>Date required</span>
         </div>
+      </>
+    );
+  };
+
+  const WaterLevelFilter = () => (
+    <div className="col-12 col-md-3 my-2">
+      <ProfileDropdown
+        selectedProfile={selectedProfile}
+        onChangeProfile={onChangeProfile}
+        profileDetailsList={profileDetailsList}
+      />
+    </div>
+  );
+
+  const getReportsData = () => {
+    switch (reportType) {
+      case "rwl":
+        waterLevel();
+        break;
+
+      default:
+        getGeneralReportsData();
+        break;
+    }
+  };
+
+  const getCurrentFilters = () => {
+    switch (reportType) {
+      case "rwl":
+        return WaterLevelFilter();
+
+      default:
+        return GeneralFilters();
+    }
+  };
+
+  const showCurrentReportTable = () => {
+    switch (reportType) {
+      case "rwl":
+        return <WaterLevelReport data={reportsData} fileName={fileName} />;
+      default:
+        return <WeatherTable data={reportsData} fileName={fileName} />;
+    }
+  };
+
+  return (
+    <div className="mainContInfo">
+      <h5 className="report-title">Reports</h5>
+      <div className="row inputs-containr_header">
+        <div className="col-12 col-md-3 my-2">
+          <ReportTypeDrop
+            reportType={reportType}
+            setReportType={setReportType}
+          />
+        </div>
+        {getCurrentFilters()}
         <div className="col-12 col-md-2 mt-4">
           <button className="btn btn-primary" onClick={getReportsData}>
             Generate Report
@@ -205,7 +292,7 @@ const Reports = () => {
             <ThreeDot color="#f58142" size="small" />
           </div>
         ) : reportsData?.length > 0 ? (
-          <WeatherTable data={reportsData} fileName={fileName} />
+          showCurrentReportTable()
         ) : (
           <div className="text-center h-50">
             {showNodata && (

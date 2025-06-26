@@ -27,7 +27,7 @@
 }
 
 .report-table-container {
-  height: 55vh;
+  max-height: 55vh;
   overflow: auto;
   white-space: nowrap;
 }
@@ -35,7 +35,7 @@
 /* Apply this on mobile screens (<= 765px width) */
 @media screen and (max-width: 764px) {
   .report-table-container {
-    height: 35vh;
+    max-height: 35vh;
   }
 }
 
