@@ -17,7 +17,7 @@ img.nav-logo {
 .nav-items {
   list-style-type: none;
   padding-left: 0 !important;
-  height: 64vh;
+  height: 72vh;
   overflow-y: auto;
 }
 

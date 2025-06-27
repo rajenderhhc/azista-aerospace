@@ -62,6 +62,7 @@ const Reports = () => {
   };
 
   const getMyStations = async (profileId) => {
+    if (reportType !== "gn") return;
     try {
       ErrorHandler.onLoading();
       setSelectedStations([]);

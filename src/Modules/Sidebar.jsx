@@ -6,6 +6,7 @@ import { MdKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import azista from "../images/azista.png";
 import locationIcon from "../images/location-icon.png";
 import { AiOutlineSearch } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 import StationOverView from "../components/StationOverView";
 import { ThreeDot } from "react-loading-indicators";
@@ -143,7 +144,7 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
     return (
       <li
         key={profileID}
-        className={`nav-item ${
+        className={`nav-item mb-3 ${
           !isSearch && isOpen ? "active-profile-view" : ""
         }`}
       >
@@ -187,7 +188,9 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
         <IoIosClose onClick={handleSidebar} />
       </div>
       <div className="logo text-center">
-        <img src={azista} alt="Azista" className="nav-logo" />
+        <Link to="/">
+          <img src={azista} alt="Azista" className="nav-logo" />
+        </Link>
       </div>
       <div className="search-bar">
         <input

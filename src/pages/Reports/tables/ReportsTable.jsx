@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { LuFileDown } from "react-icons/lu";
-import "../reports.css";
+
 import Pagination from "./Pagination";
+import DownloadReportBtn from "../DownloadReportBtn";
+
+import "../reports.css";
 
 const WeatherTable = ({ data, fileName }) => {
   const [rowsChecked, setRowsChecked] = useState(false);
@@ -76,16 +78,8 @@ const WeatherTable = ({ data, fileName }) => {
   return (
     <div className="d-flex flex-column">
       <div className="d-flex mb-1 justify-content-between align-items-center">
-        <div>
-          <span>Showing {data.length} Records</span>
-        </div>
-        <button
-          className="btn btn-primary ms-4"
-          disabled={data.length === 0}
-          onClick={downloadCSV}
-        >
-          Download Report <LuFileDown />
-        </button>
+        <span>Showing {data.length} Records</span>
+        <DownloadReportBtn disable={data.length} downloadExcel={downloadCSV} />
       </div>
       <div className="report-table-container">
         <table

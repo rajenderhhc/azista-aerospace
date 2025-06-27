@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import DownloadReportBtn from "../DownloadReportBtn";
 import { camelToTitle } from "../../../utils/tableUtils";
@@ -35,8 +35,8 @@ const groupHeaders = (headers) => {
   return grouped;
 };
 
-const getValueByPath = (obj, path) =>
-  path.split(".").reduce((acc, key) => acc?.[key] ?? "--", obj);
+const getValueByPath = (obj, path, fallback = "--") =>
+  path.split(".").reduce((acc, key) => acc?.[key] ?? fallback, obj);
 
 const SummaryReportTable = ({ data, fileName }) => {
   const displayTableRef = useRef(null); // For visible table
@@ -44,9 +44,15 @@ const SummaryReportTable = ({ data, fileName }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
 
-  const headers = extractHeaders(data[0]);
-  const groupedHeaders = groupHeaders(headers);
-  const flatHeaderArray = Object.values(groupedHeaders).flat();
+  const headers = useMemo(
+    () => (data.length > 0 ? extractHeaders(data[0]) : []),
+    [data]
+  );
+  const groupedHeaders = useMemo(() => groupHeaders(headers), [headers]);
+  const flatHeaderArray = useMemo(
+    () => Object.values(groupedHeaders).flat(),
+    [groupedHeaders]
+  );
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const currentData = data.slice(
@@ -66,7 +72,7 @@ const SummaryReportTable = ({ data, fileName }) => {
         <tr key={i}>
           {flatHeaderArray.map(({ path }) => (
             <td key={path} className="border px-2 py-1">
-              {getValueByPath(row, path)}
+              {getValueByPath(row, path, "N/A")}
             </td>
           ))}
         </tr>
@@ -86,6 +92,7 @@ const SummaryReportTable = ({ data, fileName }) => {
           const isNested = fields.some((f) => f.label !== key);
           return (
             <th
+              scope="col"
               key={key}
               colSpan={isNested ? fields.length : 1}
               rowSpan={isNested ? 1 : 2}
@@ -103,7 +110,7 @@ const SummaryReportTable = ({ data, fileName }) => {
           const isNested = fields.some((f) => f.label !== key);
           if (!isNested) return null;
           return fields.map(({ label, path }) => (
-            <th key={path} className="border px-2 py-1 bg-gray-50">
+            <th scope="col" key={path} className="border px-2 py-1 bg-gray-50">
               {camelToTitle(label)}
             </th>
           ));
@@ -116,7 +123,7 @@ const SummaryReportTable = ({ data, fileName }) => {
     <div className="d-flex flex-column">
       <div className="d-flex mb-1 justify-content-between align-items-center">
         <span>Showing {data.length} Records</span>
-        <DownloadReportBtn length={data.length} downloadExcel={onDownload} />
+        <DownloadReportBtn disable={data.length} downloadExcel={onDownload} />
       </div>
 
       {/* Visible Table (Paginated) */}
