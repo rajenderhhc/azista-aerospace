@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { LuFileDown } from "react-icons/lu";
-import "./reports.css";
+import "../reports.css";
+import Pagination from "./Pagination";
 
 const WeatherTable = ({ data, fileName }) => {
   const [rowsChecked, setRowsChecked] = useState(false);
   const [rows, setRows] = useState(
     data.map((r) => ({ ...r, isChecked: false }))
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage] = useState(10);
 
   if (!data || data.length === 0) return <p>No data available</p>;
 
@@ -64,9 +67,15 @@ const WeatherTable = ({ data, fileName }) => {
     setRowsChecked(updatedRows.every((r) => r.isChecked));
   };
 
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const currentData = data.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
   return (
-    <>
-      <div className="d-flex mb-2 justify-content-between align-items-center">
+    <div className="d-flex flex-column">
+      <div className="d-flex mb-1 justify-content-between align-items-center">
         <div>
           <span>Showing {data.length} Records</span>
         </div>
@@ -100,7 +109,7 @@ const WeatherTable = ({ data, fileName }) => {
             </tr>
           </thead>
           <tbody>
-            {rows.map((entry, index) => (
+            {currentData.map((entry, index) => (
               <tr key={index} className="border">
                 <td className="border p-2">
                   <input
@@ -121,7 +130,13 @@ const WeatherTable = ({ data, fileName }) => {
           </tbody>
         </table>
       </div>
-    </>
+      {/* Pagination Controls */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
+    </div>
   );
 };
 

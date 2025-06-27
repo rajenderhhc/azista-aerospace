@@ -60,15 +60,16 @@ const StationDropdown = (props) => {
               border: "none",
               outline: "none",
               boxShadow: state.isFocused ? "none" : base.boxShadow,
-              minHeight: "30px", // Adjust height here
-              height: "30px",
+              minHeight: "1.9rem", // Adjust height here
+              height: "1.9rem",
               overflow: "auto",
+              scrollbarWidth: "none",
             }),
-
             menu: (base) => ({
               ...base,
               zIndex: 1000,
               position: "absolute",
+              width: "180%", // ensure same as control
             }),
           }}
         />

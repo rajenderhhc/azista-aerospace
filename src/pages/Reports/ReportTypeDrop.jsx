@@ -1,7 +1,12 @@
 import React from "react";
 import Select from "react-select";
 
-const ReportTypeDrop = ({ reportType, setReportType }) => {
+const ReportTypeDrop = ({
+  reportType,
+  setReportType,
+  setReportsData,
+  setShowNodata,
+}) => {
   const options = [
     { label: "General", value: "gn" },
     { label: "Raingauge Station", value: "rgs" },
@@ -11,6 +16,8 @@ const ReportTypeDrop = ({ reportType, setReportType }) => {
   ];
 
   const onChangeReportType = (selectedOption) => {
+    setReportsData([]);
+    setShowNodata(false);
     setReportType(selectedOption ? selectedOption.value : "gn");
   };
 

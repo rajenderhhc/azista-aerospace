@@ -3,54 +3,71 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import dayjs from "dayjs";
+import moment from "moment";
 import ErrorHandler from "../../utils/errorhandler";
-import SelectDateRange from "../../components/SelectDateRange";
+
+import ReportTypeDrop from "./ReportTypeDrop";
+
+import { ThreeDot } from "react-loading-indicators";
+import { reportTypeConfig } from "./config";
 
 import "./reports.css";
-import moment from "moment";
-import { ThreeDot } from "react-loading-indicators";
-import ProfileDropdown from "./ProfilesDrop";
-import StationDropdown from "./SatationDrop";
-import WeatherTable from "./ReportsTable";
-import ReportTypeDrop from "./ReportTypeDrop";
-import WaterLevelReport from "./WaterLevelReport";
 
 const Reports = () => {
   const userData = JSON.parse(
     localStorage.getItem(process.env.REACT_APP_ADMIN_KEY)
   );
 
-  let { profileDetailsList } = userData;
+  const { profileDetailsList } = userData;
+
   const [reportType, setReportType] = useState("gn");
   const [reportsData, setReportsData] = useState([]);
   const [selectDateType, setSelectedDateType] = useState("today");
-  const [dateRange, setDateRange] = useState([
-    dayjs(), // Current date as a dayjs object
-    dayjs(), // Current date as a dayjs object
-  ]);
+  const [dateRange, setDateRange] = useState([dayjs(), dayjs()]);
   const [profileStations, setProfileStations] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(
-    profileDetailsList.length === 1 ? profileDetailsList[0].profileID : 0
+    profileDetailsList.length > 0 ? profileDetailsList[0].profileID : 0
   );
   const [selectedStations, setSelectedStations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showNodata, setShowNodata] = useState(false);
   const [stationError, setStationError] = useState(false);
   const [fileName, setFileName] = useState("station-list.csv");
+  const [filterType, setFilterType] = useState("c");
+  const [selectedTimes, onChangeTime] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  const { REACT_APP_BASE_URL, REACT_APP_JWT_TOKEN } = process.env;
+  const baseUrl = process.env.REACT_APP_BASE_URL;
+  const token = Cookies.get(process.env.REACT_APP_JWT_TOKEN);
 
-  const baseUrl = REACT_APP_BASE_URL;
-  const token = Cookies.get(REACT_APP_JWT_TOKEN);
+  const handleCustomRangeDate = (date) => setDateRange(date);
+  const onChangeProfile = (e) => setSelectedProfile(e);
 
-  const getMyStations = async (selectedProfile) => {
+  const getDatebyInputChange = () => {
+    switch (selectDateType.toLowerCase()) {
+      case "today":
+        return {
+          formDate: moment().format("DD-MMM-YYYY"),
+          toDate: moment().format("DD-MMM-YYYY"),
+        };
+      case "yesterday":
+        const y = moment().subtract(1, "day").format("DD-MMM-YYYY");
+        return { formDate: y, toDate: y };
+      default:
+        return {
+          formDate: moment(dateRange[0].$d).format("DD-MMM-YYYY"),
+          toDate: moment(dateRange[1].$d).format("DD-MMM-YYYY"),
+        };
+    }
+  };
+
+  const getMyStations = async (profileId) => {
     try {
       ErrorHandler.onLoading();
       setSelectedStations([]);
       setProfileStations([]);
       const formdata = new FormData();
-      formdata.append("profileId", selectedProfile);
-
+      formdata.append("profileId", profileId);
       const { data } = await axios.post(
         `${baseUrl}/Admin/Station/GetAllStations`,
         formdata,
@@ -59,11 +76,12 @@ const Reports = () => {
         }
       );
       ErrorHandler.onLoadingClose();
-      data.statusCode === 200
-        ? setProfileStations(data.result)
-        : ErrorHandler.onError({
-            message: data.message || "Unknown error",
-          });
+
+      if (data.statusCode === 200) {
+        setProfileStations(data.result);
+      } else {
+        ErrorHandler.onError({ message: data.message || "Unknown error" });
+      }
     } catch (error) {
       ErrorHandler.onLoadingClose();
       ErrorHandler.onError(error);
@@ -74,42 +92,11 @@ const Reports = () => {
     getMyStations(selectedProfile);
   }, [selectedProfile]);
 
-  const handleCustomRangeDate = (date) => {
-    setDateRange(date);
-  };
-
-  const onChangeProfile = (e) => {
-    setSelectedProfile(e);
-  };
-
-  const getDatebyInputChange = () => {
-    switch (selectDateType.toLowerCase()) {
-      case "today": {
-        const today = moment().format("DD-MMM-YYYY");
-        return { formDate: today, toDate: today };
-      }
-      case "yesterday": {
-        const yesterday = moment().subtract(1, "day").format("DD-MMM-YYYY");
-        return { formDate: yesterday, toDate: yesterday };
-      }
-      default: {
-        return {
-          formDate: moment(dateRange[0].$d).format("DD-MMM-YYYY"),
-          toDate: moment(dateRange[1].$d).format("DD-MMM-YYYY"),
-        };
-      }
-    }
-  };
-
-  const getGeneralReportsData = async () => {
+  const fetchGeneralReport = async () => {
     const ids = selectedStations.map((opt) => opt.value).join(",");
     const { formDate, toDate } = getDatebyInputChange();
-    if (!selectedStations.length) {
-      return setStationError(true);
-    }
-    if (!formDate || !toDate) {
-      return alert("Please select date");
-    }
+    if (!selectedStations.length) return setStationError(true);
+    if (!formDate || !toDate) return alert("Please select date");
 
     try {
       setLoading(true);
@@ -120,29 +107,25 @@ const Reports = () => {
       formdata.append("fromDate", formDate);
       formdata.append("toDate", toDate);
 
-      const url = `${baseUrl}/Report/Report/DataReport`;
-      const headers = { Authorization: `Bearer ${token}` };
-
-      const { data } = await axios.post(url, formdata, {
-        headers,
-      });
-
+      const { data } = await axios.post(
+        `${baseUrl}/Report/Report/DataReport`,
+        formdata,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setLoading(false);
       if (data.statusCode === 200) {
         setReportsData(data.result);
-
         const profile = profileDetailsList.find(
           (p) => p.profileID === selectedProfile
         );
-
         const filename =
           selectedStations.length > 1
             ? `${profile?.profileID}-${profile?.profileName}-${formDate}-${toDate}.csv`
             : `${selectedStations[0]?.label}-${formDate}-${toDate}.csv`;
-
         setFileName(filename);
-        setLoading(false);
       } else {
-        setLoading(false);
         ErrorHandler.onError({ message: data.message || "Unknown error" });
       }
     } catch (error) {
@@ -151,37 +134,27 @@ const Reports = () => {
     }
   };
 
-  const waterLevel = async () => {
+  const fetchSummaryReport = async (subPath, formdata) => {
     try {
       setLoading(true);
       setShowNodata(true);
 
-      const formdata = new FormData();
+      const { data } = await axios.post(
+        `${baseUrl}/Report/Report/${subPath}`,
+        formdata,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      formdata.append("profileId", selectedProfile);
-
-      const url = `${baseUrl}/Report/Report/WaterLevelSummaryReport`;
-      const headers = { Authorization: `Bearer ${token}` };
-
-      const { data } = await axios.post(url, formdata, {
-        headers,
-      });
-
-      console.log(data);
-
+      setLoading(false);
       if (data.statusCode === 200) {
         setReportsData(data.result);
-
         const profile = profileDetailsList.find(
           (p) => p.profileID === selectedProfile
         );
-
-        const filename = `${profile?.profileID}-WaterLevelSummaryReport.csv`;
-
-        setFileName(filename);
-        setLoading(false);
+        setFileName(`${profile?.profileID}-${subPath}`);
       } else {
-        setLoading(false);
         ErrorHandler.onError({ message: data.message || "Unknown error" });
       }
     } catch (error) {
@@ -190,82 +163,59 @@ const Reports = () => {
     }
   };
 
-  const GeneralFilters = () => {
-    return (
-      <>
-        <div className="col-12 col-md-3 my-2">
-          <ProfileDropdown
-            selectedProfile={selectedProfile}
-            onChangeProfile={onChangeProfile}
-            profileDetailsList={profileDetailsList}
-          />
-        </div>{" "}
-        <div className="col-12 col-md-3 my-2">
-          <StationDropdown
-            selectedStations={selectedStations}
-            setSelectedStations={setSelectedStations}
-            profileStations={profileStations}
-            stationError={stationError}
-            setStationError={setStationError}
-          />
-        </div>
-        <div
-          className={`col-12 ${
-            selectDateType === "custom" ? "col-md-4" : "col-md-3"
-          }`}
-        >
-          <label className="label-primary" htmlFor="dateSelect">
-            Select Date *
-          </label>
-          <SelectDateRange
-            handleCustomRangeDate={handleCustomRangeDate}
-            setSelectedDateType={setSelectedDateType}
-            selectDateType={selectDateType}
-          />
-          <span style={{ display: "none" }}>Date required</span>
-        </div>
-      </>
+  const showReportType = () => {
+    return profileDetailsList.some((p) =>
+      p.profileName.toLowerCase().includes("nhp-rj")
     );
   };
 
-  const WaterLevelFilter = () => (
-    <div className="col-12 col-md-3 my-2">
-      <ProfileDropdown
-        selectedProfile={selectedProfile}
-        onChangeProfile={onChangeProfile}
-        profileDetailsList={profileDetailsList}
-      />
-    </div>
-  );
+  const config = reportTypeConfig[reportType];
 
-  const getReportsData = () => {
+  // Utility function to get FormData for summary reports
+  const createBaseFormData = () => {
+    const formdata = new FormData();
+    if (!selectedProfile) {
+      ErrorHandler.onError({ message: "Please select a profile." });
+      return null;
+    }
+    formdata.append("profileId", selectedProfile);
+    return formdata;
+  };
+
+  // Utility: summary report mapping
+  const summaryReportMap = {
+    rwl: "WaterLevelSummaryReport",
+    ws: "AWSSummaryReport",
+    gd: "GDSummaryReport",
+    rgs: "SummaryDetailsReport",
+  };
+
+  const handleApicall = () => {
+    const formdata = createBaseFormData();
+    if (!formdata) return;
+
     switch (reportType) {
       case "rwl":
-        waterLevel();
+      case "ws":
+      case "gd":
+        fetchSummaryReport(summaryReportMap[reportType], formdata);
+        break;
+
+      case "rgs":
+        const formattedDate = selectedDate
+          ? dayjs(selectedDate).format("DD-MMM-YYYY")
+          : "";
+        const hours = selectedTimes.join(",");
+        formdata.append("date", formattedDate);
+        formdata.append("filterType", filterType);
+        formdata.append("hours", hours);
+
+        fetchSummaryReport(summaryReportMap[reportType], formdata);
         break;
 
       default:
-        getGeneralReportsData();
+        fetchGeneralReport();
         break;
-    }
-  };
-
-  const getCurrentFilters = () => {
-    switch (reportType) {
-      case "rwl":
-        return WaterLevelFilter();
-
-      default:
-        return GeneralFilters();
-    }
-  };
-
-  const showCurrentReportTable = () => {
-    switch (reportType) {
-      case "rwl":
-        return <WaterLevelReport data={reportsData} fileName={fileName} />;
-      default:
-        return <WeatherTable data={reportsData} fileName={fileName} />;
     }
   };
 
@@ -273,32 +223,58 @@ const Reports = () => {
     <div className="mainContInfo">
       <h5 className="report-title">Reports</h5>
       <div className="row inputs-containr_header">
-        <div className="col-12 col-md-3 my-2">
-          <ReportTypeDrop
-            reportType={reportType}
-            setReportType={setReportType}
-          />
-        </div>
-        {getCurrentFilters()}
-        <div className="col-12 col-md-2 mt-4">
-          <button className="btn btn-primary" onClick={getReportsData}>
+        {showReportType() && (
+          <div className="col-12 col-md-3 mb-2">
+            <ReportTypeDrop
+              reportType={reportType}
+              setReportType={setReportType}
+              setReportsData={setReportsData}
+              setShowNodata={setShowNodata}
+            />
+          </div>
+        )}
+
+        {config?.renderFilters({
+          selectedProfile,
+          onChangeProfile,
+          profileDetailsList,
+          selectedStations,
+          setSelectedStations,
+          profileStations,
+          stationError,
+          setStationError,
+          selectDateType,
+          setSelectedDateType,
+          handleCustomRangeDate,
+          filterType,
+          setFilterType,
+          selectedTimes,
+          onChangeTime,
+          selectedDate,
+          setSelectedDate,
+          reportsData,
+        })}
+
+        <div className="col-12 col-md-2 mt-3">
+          <button className="btn btn-primary" onClick={handleApicall}>
             Generate Report
           </button>
         </div>
       </div>
-      <div className="mt-2">
+
+      <div>
         {loading ? (
-          <div className="text-center h-50 ">
+          <div className="text-center h-50">
             <ThreeDot color="#f58142" size="small" />
           </div>
         ) : reportsData?.length > 0 ? (
-          showCurrentReportTable()
+          config?.TableComponent && (
+            <config.TableComponent data={reportsData} fileName={fileName} />
+          )
         ) : (
           <div className="text-center h-50">
             {showNodata && (
-              <div className="my-3">
-                <span className="text-danger text-center">No Data found</span>
-              </div>
+              <div className="my-3 text-danger">No Data found</div>
             )}
           </div>
         )}

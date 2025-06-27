@@ -36,7 +36,7 @@ const SelectDateRange = (props) => {
   return (
     <div className="d-flex align-items-center">
       <div
-        className=" report_input-container me-2"
+        className="report_input-container me-1"
         style={value === "tabularData" ? { border: "none" } : {}}
       >
         <select

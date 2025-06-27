@@ -1,6 +1,6 @@
 .report_input-container {
   border: 1px solid #e6e6e6;
-  border-radius: 25px;
+  border-radius: 1rem;
   padding: 0.5rem;
 }
 
@@ -22,11 +22,16 @@
 
 .inputs-containr_header {
   display: flex;
-  flex-wrap: nowrap;
   align-items: center;
 }
 
 .report-table-container {
+  max-height: 50vh;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.summary-table-container {
   max-height: 55vh;
   overflow: auto;
   white-space: nowrap;
@@ -35,6 +40,9 @@
 /* Apply this on mobile screens (<= 765px width) */
 @media screen and (max-width: 764px) {
   .report-table-container {
+    max-height: 30vh;
+  }
+  .summary-table-container {
     max-height: 35vh;
   }
 }
@@ -111,4 +119,15 @@
   .inputs-containr_header {
     flex-wrap: wrap;
   }
+}
+
+/* styles.css or your component CSS module */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+
+  /* Webkit (Chrome, Safari) */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

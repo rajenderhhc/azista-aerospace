@@ -1,0 +1,152 @@
+import React, { useRef, useState } from "react";
+import { useDownloadExcel } from "react-export-table-to-excel";
+import DownloadReportBtn from "../DownloadReportBtn";
+import { camelToTitle } from "../../../utils/tableUtils";
+import Pagination from "./Pagination";
+
+// Extract nested headers
+const extractHeaders = (obj, parent = "") => {
+  const headers = [];
+  for (const key in obj) {
+    const path = parent ? `${parent}.${key}` : key;
+    if (
+      typeof obj[key] === "object" &&
+      obj[key] !== null &&
+      !Array.isArray(obj[key])
+    ) {
+      headers.push(...extractHeaders(obj[key], path));
+    } else {
+      headers.push(path);
+    }
+  }
+  return headers;
+};
+
+const groupHeaders = (headers) => {
+  const grouped = {};
+  headers.forEach((fullPath) => {
+    const [top, ...rest] = fullPath.split(".");
+    if (!grouped[top]) grouped[top] = [];
+    grouped[top].push({
+      label: rest.join(".") || top,
+      path: fullPath,
+    });
+  });
+  return grouped;
+};
+
+const getValueByPath = (obj, path) =>
+  path.split(".").reduce((acc, key) => acc?.[key] ?? "--", obj);
+
+const SummaryReportTable = ({ data, fileName }) => {
+  const displayTableRef = useRef(null); // For visible table
+  const hiddenTableRef = useRef(null); // For download all records
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage] = useState(10);
+
+  const headers = extractHeaders(data[0]);
+  const groupedHeaders = groupHeaders(headers);
+  const flatHeaderArray = Object.values(groupedHeaders).flat();
+
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const currentData = data.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: hiddenTableRef.current, // Uses full hidden table
+    filename: `${fileName}_${new Date().toISOString().split("T")[0]}`,
+    sheet: `Report_${new Date().toISOString().split("T")[0]}`,
+  });
+
+  const renderTableBody = (tableData) =>
+    tableData.length > 0 ? (
+      tableData.map((row, i) => (
+        <tr key={i}>
+          {flatHeaderArray.map(({ path }) => (
+            <td key={path} className="border px-2 py-1">
+              {getValueByPath(row, path)}
+            </td>
+          ))}
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan={flatHeaderArray.length} className="py-4 text-center">
+          No data available
+        </td>
+      </tr>
+    );
+
+  const renderHeaderRows = () => (
+    <>
+      <tr>
+        {Object.entries(groupedHeaders).map(([key, fields]) => {
+          const isNested = fields.some((f) => f.label !== key);
+          return (
+            <th
+              key={key}
+              colSpan={isNested ? fields.length : 1}
+              rowSpan={isNested ? 1 : 2}
+              className={`border px-2 py-1 bg-gray-100 ${
+                isNested ? "text-center" : ""
+              }`}
+            >
+              {camelToTitle(key)}
+            </th>
+          );
+        })}
+      </tr>
+      <tr>
+        {Object.entries(groupedHeaders).map(([key, fields]) => {
+          const isNested = fields.some((f) => f.label !== key);
+          if (!isNested) return null;
+          return fields.map(({ label, path }) => (
+            <th key={path} className="border px-2 py-1 bg-gray-50">
+              {camelToTitle(label)}
+            </th>
+          ));
+        })}
+      </tr>
+    </>
+  );
+
+  return (
+    <div className="d-flex flex-column">
+      <div className="d-flex mb-1 justify-content-between align-items-center">
+        <span>Showing {data.length} Records</span>
+        <DownloadReportBtn length={data.length} downloadExcel={onDownload} />
+      </div>
+
+      {/* Visible Table (Paginated) */}
+      <div className="summary-table-container">
+        <table
+          ref={displayTableRef}
+          className="min-w-full border border-gray-300"
+          style={{ minWidth: "100%" }}
+        >
+          <thead className="reports-header">{renderHeaderRows()}</thead>
+          <tbody>{renderTableBody(currentData)}</tbody>
+        </table>
+      </div>
+
+      {/* Hidden Table (Full Data for Download) */}
+      <div style={{ display: "none" }}>
+        <table ref={hiddenTableRef}>
+          <thead>{renderHeaderRows()}</thead>
+          <tbody>{renderTableBody(data)}</tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
+    </div>
+  );
+};
+
+export default SummaryReportTable;
