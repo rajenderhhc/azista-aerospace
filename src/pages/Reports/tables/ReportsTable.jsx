@@ -5,13 +5,13 @@ import DownloadReportBtn from "../DownloadReportBtn";
 
 import "../reports.css";
 
-const WeatherTable = ({ data, fileName }) => {
+const WeatherTable = ({ data, fileName, selectDateType }) => {
   const [rowsChecked, setRowsChecked] = useState(false);
   const [rows, setRows] = useState(
     data.map((r) => ({ ...r, isChecked: false }))
   );
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   if (!data || data.length === 0) return <p>No data available</p>;
 
@@ -81,7 +81,10 @@ const WeatherTable = ({ data, fileName }) => {
         <span>Showing {data.length} Records</span>
         <DownloadReportBtn disable={data.length} downloadExcel={downloadCSV} />
       </div>
-      <div className="report-table-container">
+      <div
+        className="report-table-container"
+        style={{ maxHeight: selectDateType === "custom" ? "54vh" : "60vh" }}
+      >
         <table
           className="min-w-full border border-gray-300 report-table"
           style={{ minWidth: "100%" }}
@@ -126,6 +129,8 @@ const WeatherTable = ({ data, fileName }) => {
       </div>
       {/* Pagination Controls */}
       <Pagination
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}

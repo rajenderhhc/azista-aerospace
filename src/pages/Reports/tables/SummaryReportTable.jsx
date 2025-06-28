@@ -42,7 +42,7 @@ const SummaryReportTable = ({ data, fileName }) => {
   const displayTableRef = useRef(null); // For visible table
   const hiddenTableRef = useRef(null); // For download all records
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const headers = useMemo(
     () => (data.length > 0 ? extractHeaders(data[0]) : []),
@@ -148,6 +148,8 @@ const SummaryReportTable = ({ data, fileName }) => {
 
       {/* Pagination Controls */}
       <Pagination
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}

@@ -26,7 +26,6 @@
 }
 
 .report-table-container {
-  max-height: 50vh;
   overflow: auto;
   white-space: nowrap;
 }

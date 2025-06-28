@@ -1,7 +1,13 @@
 import React from "react";
 
 const Pagination = (props) => {
-  const { currentPage, totalPages, setCurrentPage } = props;
+  const {
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    rowsPerPage,
+    setRowsPerPage,
+  } = props;
   const getPaginationRange = (currentPage, totalPages, visiblePages = 10) => {
     let startPage = Math.max(currentPage - Math.floor(visiblePages / 2), 1);
     let endPage = startPage + visiblePages - 1;
@@ -20,7 +26,19 @@ const Pagination = (props) => {
   };
   return (
     <div className="d-flex justify-content-between">
-      <div></div>
+      <div className="flex align-self-end justify-end mt-2 space-x-2">
+        Rows Per Page{" "}
+        <select
+          value={rowsPerPage}
+          onChange={(e) => setRowsPerPage(e.target.value)}
+        >
+          {["5", "10", "20", "50", "100"].map((num) => (
+            <option key={num} value={num}>
+              {num}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="flex align-self-end justify-end mt-2 space-x-2">
         <button
           onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}

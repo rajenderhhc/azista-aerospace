@@ -20,6 +20,12 @@ const Reports = () => {
 
   const { profileDetailsList } = userData;
 
+  const getCurrentHourTime = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    return `${hours}:00`;
+  };
+
   const [reportType, setReportType] = useState("gn");
   const [reportsData, setReportsData] = useState([]);
   const [selectDateType, setSelectedDateType] = useState("today");
@@ -35,7 +41,7 @@ const Reports = () => {
   const [fileName, setFileName] = useState("station-list.csv");
   const [filterType, setFilterType] = useState("c");
   const [selectedTimes, onChangeTime] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
 
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const token = Cookies.get(process.env.REACT_APP_JWT_TOKEN);
@@ -206,7 +212,10 @@ const Reports = () => {
         const formattedDate = selectedDate
           ? dayjs(selectedDate).format("DD-MMM-YYYY")
           : "";
-        const hours = selectedTimes.join(",");
+        const hours =
+          selectedTimes.length > 0
+            ? selectedTimes.join(",")
+            : getCurrentHourTime();
         formdata.append("date", formattedDate);
         formdata.append("filterType", filterType);
         formdata.append("hours", hours);
@@ -265,15 +274,35 @@ const Reports = () => {
 
       <div>
         {loading ? (
-          <div className="text-center h-50">
+          <div
+            className="text-center"
+            style={{
+              minHeight: "5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <ThreeDot color="#f58142" size="small" />
           </div>
         ) : reportsData?.length > 0 ? (
           config?.TableComponent && (
-            <config.TableComponent data={reportsData} fileName={fileName} />
+            <config.TableComponent
+              selectDateType={selectDateType}
+              data={reportsData}
+              fileName={fileName}
+            />
           )
         ) : (
-          <div className="text-center h-50">
+          <div
+            className="text-center h-50"
+            style={{
+              minHeight: "5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             {showNodata && (
               <div className="my-3 text-danger">No Data found</div>
             )}
