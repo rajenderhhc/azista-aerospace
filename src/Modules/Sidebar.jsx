@@ -154,7 +154,9 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
               <img src={locationIcon} alt="location" className="nav-icons" />
               {profileName}
             </div>
-            <span className="profile-count">{stationCount}</span>
+            <span className="profile-count">
+              {stationCount > 99 ? "99+" : stationCount}
+            </span>
           </div>
           {isOpen ? (
             <MdKeyboardArrowUp className="d-block" size={18} />

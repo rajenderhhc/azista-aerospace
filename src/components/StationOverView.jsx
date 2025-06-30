@@ -1,18 +1,18 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-import barometer from '../images/barometer.png';
-import humidity from '../images/humidity.png';
-import thermometer from '../images/thermometer.png';
+import barometer from "../images/barometer.png";
+import humidity from "../images/humidity.png";
+import thermometer from "../images/thermometer.png";
 
-import RainFall from '../images/sensorIcons/rain.png';
-import BatteryVoltage from '../images/sensorIcons/battery Voltage.png';
-import WindDirection from '../images/sensorIcons/Wind Directio.png';
-import WindSpeed from '../images/sensorIcons/Wind Speed.png';
+import RainFall from "../images/sensorIcons/rain.png";
+import BatteryVoltage from "../images/sensorIcons/battery Voltage.png";
+import WindDirection from "../images/sensorIcons/Wind Directio.png";
+import WindSpeed from "../images/sensorIcons/Wind Speed.png";
 
-import './map.css';
-import { FaCircle } from 'react-icons/fa';
-import { useStationProfile } from '../context/stationContext';
+import "./map.css";
+import { FaCircle } from "react-icons/fa";
+import { useStationProfile } from "../context/stationContext";
 
 const StationOverView = (props) => {
   const { stations, viewSummary, activeEffect } = props;
@@ -20,31 +20,31 @@ const StationOverView = (props) => {
 
   const navigate = useNavigate();
   const goToSummary = (station) => {
-    sessionStorage.setItem('activeStation', station.stationId);
-    sessionStorage.setItem('activeprofileId', station.profileId);
+    sessionStorage.setItem("activeStation", station.stationId);
+    sessionStorage.setItem("activeprofileId", station.profileId);
     setActiveStationId(station.stationId);
-    navigate('/station/summary', {
+    navigate("/station/summary", {
       state: { station },
     });
   };
 
   const getSensorIcon = (key) => {
     switch (key) {
-      case 'Wind Direction':
+      case "Wind Direction":
         return WindDirection;
-      case 'Daily Rain':
+      case "Daily Rain":
         return RainFall;
-      case 'Hourly Rainfall':
+      case "Hourly Rainfall":
         return RainFall;
-      case 'Wind Speed':
+      case "Wind Speed":
         return WindSpeed;
-      case 'Battery Voltage':
+      case "Battery Voltage":
         return BatteryVoltage;
-      case 'Air Temperature':
+      case "Air Temperature":
         return thermometer;
-      case 'Humidity':
+      case "Humidity":
         return humidity;
-      case 'Atmospheric Pressure':
+      case "Atmospheric Pressure":
         return barometer;
       default:
         return null;
@@ -56,57 +56,59 @@ const StationOverView = (props) => {
       {stations.map((station, i) => {
         const isActiveTab =
           activeEffect && station.stationId === activeStationId
-            ? 'activestation'
-            : '';
+            ? "activestation"
+            : "";
         return (
           <div key={station.stationId}>
             <div
               className={`station-weather-report ${isActiveTab}`}
-              onClick={() => goToSummary(station)}>
+              onClick={() => goToSummary(station)}
+            >
               <span className={`stationName ${isActiveTab}`}>
                 {station.stationName} - {station.stationId}
               </span>
-              <span className='profileName'>
+              <span className="profileName">
                 {station.profileName} , {station.district}
               </span>
-              <div className='tool-status-container'>
+              <div className="tool-status-container">
                 <FaCircle
-                  size='8'
-                  className='me-1'
-                  fill={station.stationStatus === 'Yes' ? '#00FF09' : '#FF0000'}
+                  size="8"
+                  className="me-1"
+                  fill={station.stationStatus === "Yes" ? "#00FF09" : "#FF0000"}
                 />
-                {station.stationStatus === 'Yes' ? 'Online' : 'Offline'}
+                {station.stationStatus === "Yes" ? "Online" : "Offline"}
               </div>
-              <div className='report-data d-flex justify-content-between my-2'>
+              <div className="report-data d-flex justify-content-between my-2">
                 {Object.keys(station?.stationEnvDataList).map((key) => (
                   <div
                     key={key}
-                    className='d-flex flex-column align-items-center'>
+                    className="d-flex flex-column align-items-center"
+                  >
                     {getSensorIcon(key) ? (
                       <img
                         src={getSensorIcon(key)}
-                        alt='heat-icon'
-                        className='instrument-icon'
+                        alt="heat-icon"
+                        className="instrument-icon"
                       />
                     ) : (
                       <img
                         src={thermometer}
-                        alt='thermometer'
-                        className='instrument-icon'
+                        alt="thermometer"
+                        className="instrument-icon"
                       />
                     )}
 
-                    <span className='d-block instrument-icon-val'>
+                    <span className="d-block instrument-icon-val">
                       {station?.stationEnvDataList?.[key] ?? 0}
                     </span>
                   </div>
                 ))}
               </div>
               {viewSummary && (
-                <span className='link-item_btn'>View Station Summary</span>
+                <span className="link-item_btn">View Station Summary</span>
               )}
             </div>
-            {i !== stations.length - 1 && <hr style={{ margin: '0px' }} />}
+            {i !== stations.length - 1 && <hr style={{ margin: "0px" }} />}
           </div>
         );
       })}
@@ -115,24 +117,3 @@ const StationOverView = (props) => {
 };
 
 export default StationOverView;
-
-/* <div className='d-flex flex-column align-items-center'>
-                <img
-                  src={humidity}
-                  alt='humidity'
-                  className='instrument-icon'
-                />
-                <span className='d-block instrument-icon-val'>
-                  {station?.stationEnvDataList?.['Humidity'] || 0}
-                </span>
-              </div>
-              <div className='d-flex flex-column align-items-center'>
-                <img
-                  src={barometer}
-                  alt='barometer'
-                  className='instrument-icon'
-                />
-                <span className='d-block instrument-icon-val'>
-                  {station?.stationEnvDataList?.['Atmospheric Pressure'] || 0}
-                </span>
-              </div> */

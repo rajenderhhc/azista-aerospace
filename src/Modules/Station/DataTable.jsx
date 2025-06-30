@@ -5,6 +5,7 @@ import Table from "react-bootstrap/Table";
 
 import { LuFileDown } from "react-icons/lu";
 import calendar from "../../images/calendar.png";
+import { convertTemperature } from "../../utils/converstions";
 
 const DataTable = (props) => {
   const {
@@ -65,7 +66,10 @@ const DataTable = (props) => {
       Date: each.date,
       Time: each.time,
     };
-    return lookup[val] ?? each.sensorDataList?.[val] ?? "-"; // Default value
+    return (
+      lookup[val] ??
+      convertTemperature(each.sensorDataList?.[val] ?? "-", "c", "f", val)
+    ); // Default value
   };
 
   return (

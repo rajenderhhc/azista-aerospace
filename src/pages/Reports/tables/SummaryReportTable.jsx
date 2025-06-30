@@ -22,25 +22,36 @@ const extractHeaders = (obj, parent = "") => {
   return headers;
 };
 
+// Group headers with special case for "dynamicFileds"
 const groupHeaders = (headers) => {
   const grouped = {};
   headers.forEach((fullPath) => {
     const [top, ...rest] = fullPath.split(".");
-    if (!grouped[top]) grouped[top] = [];
-    grouped[top].push({
-      label: rest.join(".") || top,
-      path: fullPath,
-    });
+    if (top === "dynamicFileds") {
+      grouped[fullPath] = [
+        {
+          label: rest.join(".") || top,
+          path: fullPath,
+        },
+      ];
+    } else {
+      if (!grouped[top]) grouped[top] = [];
+      grouped[top].push({
+        label: rest.join(".") || top,
+        path: fullPath,
+      });
+    }
   });
   return grouped;
 };
 
+// Utility to safely get nested values
 const getValueByPath = (obj, path, fallback = "--") =>
   path.split(".").reduce((acc, key) => acc?.[key] ?? fallback, obj);
 
 const SummaryReportTable = ({ data, fileName }) => {
-  const displayTableRef = useRef(null); // For visible table
-  const hiddenTableRef = useRef(null); // For download all records
+  const displayTableRef = useRef(null);
+  const hiddenTableRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -48,6 +59,7 @@ const SummaryReportTable = ({ data, fileName }) => {
     () => (data.length > 0 ? extractHeaders(data[0]) : []),
     [data]
   );
+
   const groupedHeaders = useMemo(() => groupHeaders(headers), [headers]);
   const flatHeaderArray = useMemo(
     () => Object.values(groupedHeaders).flat(),
@@ -61,7 +73,7 @@ const SummaryReportTable = ({ data, fileName }) => {
   );
 
   const { onDownload } = useDownloadExcel({
-    currentTableRef: hiddenTableRef.current, // Uses full hidden table
+    currentTableRef: hiddenTableRef.current,
     filename: `${fileName}_${new Date().toISOString().split("T")[0]}`,
     sheet: `Report_${new Date().toISOString().split("T")[0]}`,
   });
@@ -85,48 +97,78 @@ const SummaryReportTable = ({ data, fileName }) => {
       </tr>
     );
 
-  const renderHeaderRows = () => (
-    <>
-      <tr>
-        {Object.entries(groupedHeaders).map(([key, fields]) => {
-          const isNested = fields.some((f) => f.label !== key);
-          return (
+  const renderHeaderRows = () => {
+    const firstRowHeaders = [];
+    const secondRowHeaders = [];
+
+    Object.entries(groupedHeaders).forEach(([key, fields]) => {
+      const isFlat = key.startsWith("dynamicFileds.");
+      const isNested = fields.some((f) => f.label !== key);
+
+      if (isFlat) {
+        // Render each dynamic field directly
+        fields.forEach(({ label, path }) => {
+          firstRowHeaders.push(
             <th
+              key={path}
               scope="col"
-              key={key}
-              colSpan={isNested ? fields.length : 1}
-              rowSpan={isNested ? 1 : 2}
-              className={`border px-2 py-1 bg-gray-100 ${
-                isNested ? "text-center" : ""
-              }`}
+              className="border px-2 py-1 bg-gray-100"
+              rowSpan={2}
             >
-              {camelToTitle(key)}
-            </th>
-          );
-        })}
-      </tr>
-      <tr>
-        {Object.entries(groupedHeaders).map(([key, fields]) => {
-          const isNested = fields.some((f) => f.label !== key);
-          if (!isNested) return null;
-          return fields.map(({ label, path }) => (
-            <th scope="col" key={path} className="border px-2 py-1 bg-gray-50">
               {camelToTitle(label)}
             </th>
-          ));
-        })}
-      </tr>
-    </>
-  );
+          );
+        });
+      } else {
+        firstRowHeaders.push(
+          <th
+            scope="col"
+            key={key}
+            colSpan={isNested ? fields.length : 1}
+            rowSpan={isNested ? 1 : 2}
+            className={`border px-2 py-1 bg-gray-100 ${
+              isNested ? "text-center" : ""
+            }`}
+          >
+            {camelToTitle(key)}
+          </th>
+        );
+
+        if (isNested) {
+          fields.forEach(({ label, path }) => {
+            secondRowHeaders.push(
+              <th
+                scope="col"
+                key={path}
+                className="border px-2 py-1 bg-gray-50"
+              >
+                {camelToTitle(label)}
+              </th>
+            );
+          });
+        }
+      }
+    });
+
+    return (
+      <>
+        <tr>{firstRowHeaders}</tr>
+        {secondRowHeaders.length > 0 && <tr>{secondRowHeaders}</tr>}
+      </>
+    );
+  };
 
   return (
     <div className="d-flex flex-column">
       <div className="d-flex mb-1 justify-content-between align-items-center">
         <span>Showing {data.length} Records</span>
-        <DownloadReportBtn disable={data.length} downloadExcel={onDownload} />
+        <DownloadReportBtn
+          disable={data.length === 0}
+          downloadExcel={onDownload}
+        />
       </div>
 
-      {/* Visible Table (Paginated) */}
+      {/* Visible Table */}
       <div className="summary-table-container">
         <table
           ref={displayTableRef}
@@ -138,15 +180,36 @@ const SummaryReportTable = ({ data, fileName }) => {
         </table>
       </div>
 
-      {/* Hidden Table (Full Data for Download) */}
-      <div style={{ display: "none" }}>
-        <table ref={hiddenTableRef}>
-          <thead>{renderHeaderRows()}</thead>
-          <tbody>{renderTableBody(data)}</tbody>
-        </table>
-      </div>
+      {/* Hidden Table for Export */}
+      {(() => {
+        const hasDynamicFields = Object.keys(groupedHeaders).some((key) =>
+          key.startsWith("dynamicFileds.")
+        );
 
-      {/* Pagination Controls */}
+        return (
+          <div style={{ display: "none" }}>
+            <table
+              ref={hiddenTableRef}
+              style={{ position: "absolute", top: "-9999px" }}
+            >
+              <thead>{renderHeaderRows()}</thead>
+              <tbody>
+                {hasDynamicFields && (
+                  <tr>
+                    <td
+                      colSpan={flatHeaderArray.length}
+                      className="py-4 text-center"
+                    ></td>
+                  </tr>
+                )}
+                {renderTableBody(data)}
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
+
+      {/* Pagination */}
       <Pagination
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
