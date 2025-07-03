@@ -152,7 +152,7 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
           <div className="customDropdown-continer">
             <img src={locationIcon} alt="location" className="nav-icons" />
             <p className="w-75 text-start mb-0">{profileName}</p>
-            <p className="profile-count mx-1 mb-0">
+            <p className="profile-count ms-1 mb-0">
               {stationCount > 99 ? "99+" : stationCount}
             </p>
           </div>
