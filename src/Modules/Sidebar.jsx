@@ -148,15 +148,13 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
           !isSearch && isOpen ? "active-profile-view" : ""
         }`}
       >
-        <button onClick={handleProfileClick} className="customDropdown d-flex">
-          <div className="w-75 d-flex justify-content-between align-items-center">
-            <div>
-              <img src={locationIcon} alt="location" className="nav-icons" />
-              {profileName}
-            </div>
-            <span className="profile-count">
+        <button onClick={handleProfileClick} className="customDropdown">
+          <div className="customDropdown-continer">
+            <img src={locationIcon} alt="location" className="nav-icons" />
+            <p className="w-75 text-start mb-0">{profileName}</p>
+            <p className="profile-count mx-1 mb-0">
               {stationCount > 99 ? "99+" : stationCount}
-            </span>
+            </p>
           </div>
           {isOpen ? (
             <MdKeyboardArrowUp className="d-block" size={18} />

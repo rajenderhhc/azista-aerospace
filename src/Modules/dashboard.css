@@ -33,6 +33,13 @@ img.nav-logo {
   align-items: center;
   width: 100%;
   font-weight: 600;
+  display: flex;
+}
+
+.customDropdown-continer {
+  display: flex;
+  width: 90%;
+  align-items: center;
 }
 
 .profile-count {
@@ -46,6 +53,7 @@ img.nav-logo {
   display: flex;
   align-items: center;
   justify-content: center;
+  justify-self: flex-end;
 }
 
 .nav-item-link {
