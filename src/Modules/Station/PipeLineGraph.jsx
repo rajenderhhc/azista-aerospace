@@ -31,7 +31,7 @@ const groupWeatherData = (weatherReport) => {
   return Object.values(groupedData);
 };
 
-const MultiLineChart = () => {
+const MultiLineChart = ({ defaultParamerts }) => {
   const [weatherReport, setWeatherReport] = useState([]);
   const fullChartData = useMemo(
     () => groupWeatherData(weatherReport),
@@ -39,7 +39,7 @@ const MultiLineChart = () => {
   );
   const [startIndex, setStartIndex] = useState(0);
   const [windowSize, setWindowSize] = useState(1000);
-  const [highlighteds, setHighlighteds] = useState([]);
+  const [highlighteds, setHighlighteds] = useState(defaultParamerts);
   const [zoomFactor, setZoomFactor] = useState(10); // Zoom factor state
 
   const location = useLocation();

@@ -8,13 +8,16 @@ import {
   Popup,
   LayersControl,
   useMap,
+  Tooltip,
 } from "react-leaflet";
+
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import StationOverView from "./StationOverView";
 import ErrorHandler from "../utils/errorhandler";
 import { ThreeDot } from "react-loading-indicators";
 import { useStationProfile } from "../context/stationContext";
+import { PROFILES_COLORS } from "../utils/profiles";
 
 const { BaseLayer } = LayersControl;
 
@@ -74,6 +77,7 @@ const MapEmbed = ({
 
   const fetchStationData = async (stationId) => {
     if (!stationId) return;
+    setActiveMarker(stationId);
     try {
       setLoading(true);
       const headers = { Authorization: `Bearer ${token}` };
@@ -103,18 +107,47 @@ const MapEmbed = ({
     }
   };
 
-  const createCustomIcon = (isActive) =>
-    new L.Icon({
-      iconUrl: isActive
-        ? "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png"
-        : "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  const createCustomIcon = (isActive, profileName) => {
+    const color = isActive
+      ? "#000000"
+      : PROFILES_COLORS[profileName] || "#2e8ff7ff";
+
+    const svgIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">
+      <path fill="${color}" d="M12.5 0C5.6 0 0 5.6 0 12.5 0 22.2 12.5 41 12.5 41S25 22.2 25 12.5C25 5.6 19.4 0 12.5 0z"/>
+      <circle cx="13" cy="13" r="4" fill="white"/>
+    </svg>
+  `;
+
+    const svgUrl = "data:image/svg+xml;base64," + btoa(svgIcon);
+
+    return new L.Icon({
+      iconUrl: svgUrl,
       iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
+      iconAnchor: [12.5, 41],
+      popupAnchor: [0, -35],
       shadowUrl:
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
       shadowSize: [41, 41],
     });
+  };
+
+  // const createCustomIcon = (isActive, profileName) => {
+  //   const colorHex = profileColors[profileName] || "007bff"; // fallback to blue
+  //   const colorUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${colorHex}.png`;
+
+  //   return new L.Icon({
+  //     iconUrl: isActive
+  //       ? "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png"
+  //       : colorUrl,
+  //     iconSize: [25, 41],
+  //     iconAnchor: [12, 41],
+  //     popupAnchor: [1, -34],
+  //     shadowUrl:
+  //       "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  //     shadowSize: [41, 41],
+  //   });
+  // };
 
   const centerCoordinates =
     locations.length > 0
@@ -142,17 +175,16 @@ const MapEmbed = ({
         </LayersControl>
         {locations.map((loc, i) => {
           const [lat, lon] = getValidCoordinates(loc.latitude, loc.longitude);
-
           return (
             <Marker
               key={loc.stationId || i}
               position={[lat, lon]}
-              icon={createCustomIcon(activeMarker === loc.stationId)}
+              icon={createCustomIcon(
+                activeMarker === loc.stationId,
+                loc.profileName
+              )}
               eventHandlers={{
-                click: () => {
-                  setActiveMarker(loc.stationId);
-                  fetchStationData(loc.stationId);
-                },
+                click: () => fetchStationData(loc.stationId),
                 ...(viewSummary && {
                   mouseover: () => {
                     setActiveMarker(loc.stationId);
@@ -167,6 +199,9 @@ const MapEmbed = ({
                 }),
               }}
             >
+              <Tooltip direction="top" offset={[0, -30]} opacity={1}>
+                <span>{loc.stationName}</span>
+              </Tooltip>
               <Popup>
                 {loading ? (
                   <ThreeDot color="#f58142" size="small" />

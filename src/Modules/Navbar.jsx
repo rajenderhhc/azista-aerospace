@@ -16,6 +16,7 @@ import { TbFileDatabase } from "react-icons/tb";
 import { LuBellDot } from "react-icons/lu";
 import { RxPerson } from "react-icons/rx";
 import { useEffect, useState } from "react";
+import { Tooltip } from "antd";
 import Notifications from "./Notifications";
 import "./dashboard.css";
 
@@ -102,50 +103,59 @@ const NavbarModule = ({ toggleSidebar, showSidebar }) => {
           {/* <Navbar.Toggle aria-controls='basic-navbar-nav' /> */}
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto navItemsCont">
-              <Link
-                to="/"
-                className={`nav-item-link ${
-                  pathname === "/" ? "active-nav" : ""
-                }`}
-              >
-                <IoHomeOutline />
-              </Link>
-
-              <Link
-                to="/reports"
-                className={`nav-item-link ${
-                  pathname === "/reports" ? "active-nav" : ""
-                }`}
-              >
-                <TbFileDatabase />
-              </Link>
-              <div
-                onClick={() => toggleNotificationsBar(true)}
-                className={`nav-item-link notification ${
-                  showNotificationsBar && nofications.length ? "active-nav" : ""
-                }`}
-              >
-                <LuBellDot />
-                {unreadCount > 0 && (
-                  <p className="notific-count">{unreadCount}</p>
-                )}
-              </div>
-              <Link
-                to="/profile"
-                className={`nav-item-link ${
-                  pathname.startsWith("/profile") ? "active-nav" : ""
-                }`}
-              >
-                {userData?.userImage ? (
-                  <img
-                    style={{ width: "100%", borderRadius: "50%" }}
-                    src={userData?.userImage}
-                    alt="profile"
-                  />
-                ) : (
-                  <RxPerson />
-                )}
-              </Link>
+              <Tooltip title={"Home"}>
+                <Link
+                  to="/"
+                  className={`nav-item-link ${
+                    pathname === "/" ? "active-nav" : ""
+                  }`}
+                >
+                  <IoHomeOutline />
+                </Link>
+              </Tooltip>
+              <Tooltip title={"Reports"}>
+                <Link
+                  to="/reports"
+                  className={`nav-item-link ${
+                    pathname === "/reports" ? "active-nav" : ""
+                  }`}
+                >
+                  <TbFileDatabase />
+                </Link>
+              </Tooltip>
+              <Tooltip title="Notifications">
+                <div
+                  onClick={() => toggleNotificationsBar(true)}
+                  className={`nav-item-link notification ${
+                    showNotificationsBar && nofications.length
+                      ? "active-nav"
+                      : ""
+                  }`}
+                >
+                  <LuBellDot />
+                  {unreadCount > 0 && (
+                    <p className="notific-count">{unreadCount}</p>
+                  )}
+                </div>
+              </Tooltip>
+              <Tooltip title="Profile">
+                <Link
+                  to="/profile"
+                  className={`nav-item-link ${
+                    pathname.startsWith("/profile") ? "active-nav" : ""
+                  }`}
+                >
+                  {userData?.userImage ? (
+                    <img
+                      style={{ width: "100%", borderRadius: "50%" }}
+                      src={userData?.userImage}
+                      alt="profile"
+                    />
+                  ) : (
+                    <RxPerson />
+                  )}
+                </Link>
+              </Tooltip>
               <Link to="" className="nav-item-link d-md-none">
                 <AiOutlineLogout onClick={onLogOut} />
               </Link>

@@ -12,13 +12,15 @@ import { ThreeDot } from "react-loading-indicators";
 import { reportTypeConfig } from "./config";
 
 import "./reports.css";
+import { useStationProfile } from "../../context/stationContext";
 
 const Reports = () => {
   const userData = JSON.parse(
     localStorage.getItem(process.env.REACT_APP_ADMIN_KEY)
   );
-
   const { profileDetailsList } = userData;
+
+  const { isRjProfile } = useStationProfile();
 
   const getCurrentHourTime = () => {
     const now = new Date();
@@ -170,12 +172,6 @@ const Reports = () => {
     }
   };
 
-  const showReportType = () => {
-    return profileDetailsList.some((p) =>
-      p.profileName.toLowerCase().includes("nhp-rj")
-    );
-  };
-
   const config = reportTypeConfig[reportType];
 
   // Utility function to get FormData for summary reports
@@ -233,7 +229,7 @@ const Reports = () => {
     <div className="mainContInfo">
       <h5 className="report-title">Reports</h5>
       <div className="row inputs-containr_header">
-        {showReportType() && (
+        {isRjProfile && (
           <div className="col-12 col-md-3 mb-2">
             <ReportTypeDrop
               reportType={reportType}

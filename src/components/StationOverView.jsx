@@ -15,7 +15,8 @@ import { FaCircle } from "react-icons/fa";
 import { useStationProfile } from "../context/stationContext";
 
 const StationOverView = (props) => {
-  const { stations, viewSummary, activeEffect } = props;
+  const { stations, viewSummary, activeEffect, profileName } = props;
+
   const { activeStationId, setActiveStationId } = useStationProfile();
 
   const navigate = useNavigate();
@@ -24,7 +25,12 @@ const StationOverView = (props) => {
     sessionStorage.setItem("activeprofileId", station.profileId);
     setActiveStationId(station.stationId);
     navigate("/station/summary", {
-      state: { station },
+      state: {
+        station: {
+          ...station,
+          profileName: profileName || station.profileName,
+        },
+      },
     });
   };
 

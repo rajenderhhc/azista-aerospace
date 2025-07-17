@@ -9,135 +9,270 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [userData, setUserData] = useState({ emailAddress: "", password: "" });
+  const [resetPasswords, setResetPasswords] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const tokenKey = process.env.REACT_APP_JWT_TOKEN;
+  const [view, setView] = useState("login"); // "login" | "reset-request" | "reset-password"
+
+  const tokenKey = process.env.REACT_APP_JWT_TOKEN || "token";
   const jwtToken = Cookies.get(tokenKey);
+  const baseUrl = process.env.REACT_APP_BASE_URL || "";
   const navigate = useNavigate();
 
   useEffect(() => {
     if (jwtToken) navigate("/");
   }, [jwtToken, navigate]);
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  const handleOnChange = (e) => {
+  const handleInputChange = (e, stateSetter) => {
     setErrorMessage("");
     const { id, value } = e.target;
-    setUserData((prev) => ({ ...prev, [id]: value }));
+    stateSetter((prev) => ({ ...prev, [id]: value }));
   };
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const validatePassword = (password) => {
-    return password.length >= 1;
-  };
-
-  const baseUrl = process.env.REACT_APP_BASE_URL;
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (password) => password.length > 0;
 
   const onSubmitSuccess = (userData) => {
-    Cookies.set(tokenKey, userData.token, { expires: 50 / (24 * 60) });
+    Cookies.set(tokenKey, userData.token, { expires: 50 / (24 * 60) }); // Expires in ~50 mins
     localStorage.setItem(
-      process.env.REACT_APP_ADMIN_KEY,
+      process.env.REACT_APP_ADMIN_KEY || "admin",
       JSON.stringify(userData)
     );
     navigate("/");
   };
 
-  const onSubmitLogin = async () => {
-    if (!validateEmail(userData.emailAddress)) {
-      setErrorMessage("Invalid email address.");
-      return;
-    }
-
-    if (!validatePassword(userData.password)) {
-      setErrorMessage("Enter password");
-      //Password must be at least 8 characters long.
-      return;
-    }
+  const onSubmitLogin = async (e) => {
+    e.preventDefault();
+    const { emailAddress, password } = userData;
+    if (!validateEmail(emailAddress))
+      return setErrorMessage("Invalid email address.");
+    if (!validatePassword(password))
+      return setErrorMessage("Password is required.");
 
     try {
-      const url = `${baseUrl}/UserAuthenticate/Login`;
       const formData = new FormData();
-      formData.append("emailAddress", userData.emailAddress);
-      formData.append("password", userData.password);
+      formData.append("emailAddress", emailAddress);
+      formData.append("password", password);
 
       ErrorHandler.onLoading();
-      const response = await axios.post(url, formData, {
-        headers: { Accept: "*/*", "Access-Control-Allow-Origin": "*/*" },
-      });
-
+      const { data } = await axios.post(
+        `${baseUrl}/UserAuthenticate/Login`,
+        formData
+      );
       ErrorHandler.onLoadingClose();
-      const { data } = response;
 
-      if (data.statusCode === 200) {
-        onSubmitSuccess(data.result);
-      } else {
-        setErrorMessage(data.message);
-      }
+      data.statusCode === 200
+        ? onSubmitSuccess(data.result)
+        : setErrorMessage(data.message);
     } catch (error) {
       ErrorHandler.onLoadingClose();
       setErrorMessage(ErrorHandler.errMsg(error));
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") onSubmitLogin();
+  const onSubmitResetPassword = (e) => {
+    e.preventDefault();
+    const { newPassword, confirmPassword } = resetPasswords;
+    if (!newPassword || !confirmPassword)
+      return setErrorMessage("All fields are required.");
+    if (newPassword !== confirmPassword)
+      return setErrorMessage("Passwords do not match.");
+
+    // Add actual API call for resetting password here
+    alert(`Resetting password..., ${newPassword}`);
+    console.log("Resetting password...", newPassword);
+
+    setResetPasswords({ newPassword: "", confirmPassword: "" });
+    setView("login");
   };
+
+  const onSubmitResetRequest = (e) => {
+    e.preventDefault();
+    const { emailAddress } = userData;
+    if (!validateEmail(emailAddress))
+      return setErrorMessage("Enter a valid email.");
+    // Add actual API call to request reset link here
+    alert("Requesting password reset for:", emailAddress);
+    console.log(`Requesting password reset for: ${emailAddress}`);
+
+    setShowPassword(false);
+    setView("reset-password");
+    setUserData({ emailAddress: "", password: "" });
+  };
+
+  const handleKeyDown = (e) => e.key === "Enter" && onSubmitLogin();
 
   return (
     <div className="bg-image">
       <div className="login-container">
         <img src={Azistalogo} alt="logo" className="logo-img" />
         <p>Weather Web Portal</p>
-        <h5 className="my-3">Login</h5>
-        <div className="form-floating w-100 mb-4">
-          <input
-            type="text"
-            className="form-control login-input"
-            id="emailAddress"
-            value={userData.emailAddress}
-            onChange={handleOnChange}
-            placeholder="name@example.com"
-            autoComplete="email"
-          />
-          <label htmlFor="emailAddress">User Name / Email Address</label>
-        </div>
 
-        <div className="password-cont w-100">
-          <div className="form-floating w-100">
-            <input
-              type={showPassword ? "text" : "password"}
-              className="form-control login-input"
-              id="password"
-              autoComplete="off"
-              value={userData.password}
-              onChange={handleOnChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Password"
-            />
-            <label htmlFor="password">Password</label>
-          </div>
-          <div onClick={handleClickShowPassword} className="eye-icon">
-            {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
-          </div>
-        </div>
-        <div className="my-4 w-100">
-          <button
-            onClick={onSubmitLogin}
-            style={{ fontWeight: "700" }}
-            className="btn btn-light btn-lg btn-block w-100 btn-outline-primary"
-            type="button"
-          >
-            LOG IN
-          </button>
-          {/* <small className='text-center d-block mt-2'>
-            Do not have an account? Create Account.
-          </small> */}
-        </div>
-        {errorMessage && <p className="text-danger">{errorMessage}</p>}
+        {view === "login" && (
+          <form onSubmit={onSubmitLogin} className="w-100 text-center">
+            <h5 className="my-3">Login</h5>
+            <div className="form-floating w-100 mb-4">
+              <input
+                type="text"
+                id="emailAddress"
+                className="form-control login-input"
+                minLength={11}
+                maxLength={100}
+                value={userData.emailAddress}
+                onChange={(e) => handleInputChange(e, setUserData)}
+                placeholder="name@example.com"
+                autoComplete="email"
+              />
+              <label htmlFor="emailAddress">User Name / Email Address</label>
+            </div>
+
+            <div className="password-cont w-100">
+              <div className="form-floating w-100">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  minLength={5}
+                  maxLength={12}
+                  className="form-control login-input"
+                  value={userData.password}
+                  onChange={(e) => handleInputChange(e, setUserData)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Password"
+                  autoComplete="off"
+                />
+                <label htmlFor="password">Password</label>
+              </div>
+              <div onClick={togglePasswordVisibility} className="eye-icon">
+                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+              </div>
+            </div>
+
+            <div className="my-4 w-100">
+              <button
+                type="submit"
+                style={{ fontWeight: "600", fontSize: "medium" }}
+                className="btn btn-light btn-lg btn-block w-100 btn-outline-primary"
+              >
+                LOG IN
+              </button>
+              <small
+                onClick={() => setView("reset-request")}
+                className="text-center d-block mt-2"
+                style={{ cursor: "pointer" }}
+              >
+                Reset Password?
+              </small>
+            </div>
+          </form>
+        )}
+
+        {view === "reset-request" && (
+          <form onSubmit={onSubmitResetRequest} className="w-100 text-center">
+            <h5 className="my-1">Reset Password</h5>
+            <small className="mb-3 d-block">
+              Enter your registered email address to <br /> receive a link to
+              reset your password.
+            </small>
+            <div className="form-floating w-100 mb-4">
+              <input
+                type="text"
+                id="emailAddress"
+                minLength={11}
+                maxLength={100}
+                className="form-control login-input"
+                value={userData.emailAddress}
+                onChange={(e) => handleInputChange(e, setUserData)}
+                placeholder="name@example.com"
+              />
+              <label htmlFor="emailAddress">User Name / Email Address</label>
+            </div>
+
+            <div className="my-4 w-100">
+              <button
+                type="submit"
+                style={{ fontWeight: "600", fontSize: "medium" }}
+                className="btn btn-light btn-lg btn-block w-100 btn-outline-primary"
+              >
+                Submit
+              </button>
+              <small
+                onClick={() => setView("login")}
+                className="text-center d-block mt-2"
+                style={{ cursor: "pointer" }}
+              >
+                Don’t want to reset your password? Log in
+              </small>
+            </div>
+          </form>
+        )}
+
+        {view === "reset-password" && (
+          <form onSubmit={onSubmitResetPassword} className="w-100 text-center">
+            <h5 className="my-1">Reset Password</h5>
+            <small className="mb-3 d-block">
+              Enter a new password for your account. <br /> Make sure it’s
+              strong and secure.
+            </small>
+            <div className="password-cont w-100">
+              <div className="form-floating w-100">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="newPassword"
+                  className="form-control login-input"
+                  minLength={5}
+                  maxLength={12}
+                  value={resetPasswords.newPassword}
+                  onChange={(e) => handleInputChange(e, setResetPasswords)}
+                  placeholder="New Password"
+                />
+                <label htmlFor="newPassword">New Password</label>
+              </div>
+              <div onClick={togglePasswordVisibility} className="eye-icon">
+                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+              </div>
+            </div>
+
+            <div className="form-floating w-100 mt-3">
+              <input
+                type="password"
+                id="confirmPassword"
+                className="form-control login-input"
+                minLength={5}
+                maxLength={12}
+                value={resetPasswords.confirmPassword}
+                onChange={(e) => handleInputChange(e, setResetPasswords)}
+                placeholder="Confirm Password"
+              />
+              <label htmlFor="confirmPassword">Confirm Password</label>
+            </div>
+
+            <div className="my-4 w-100">
+              <button
+                type="submit"
+                style={{ fontWeight: "600", fontSize: "medium" }}
+                className="btn btn-light btn-lg btn-block w-100 btn-outline-primary"
+              >
+                Reset Password & Log In
+              </button>
+              <small
+                onClick={() => setView("login")}
+                className="text-center d-block mt-2"
+                style={{ cursor: "pointer" }}
+              >
+                Don’t want to reset your password? Log in
+              </small>
+            </div>
+          </form>
+        )}
+
+        {errorMessage && (
+          <p className="text-danger text-center">{errorMessage}</p>
+        )}
       </div>
     </div>
   );

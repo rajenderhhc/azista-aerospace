@@ -31,11 +31,11 @@
 }
 
 .login-container {
-  min-width: 23rem;
+  min-width: 30%;
   position: relative;
   z-index: 2;
   background: rgba(19, 19, 19, 0.79);
-  padding: 0.5rem;
+  padding: 1rem;
   border: 1px solid rgba(67, 67, 67, 1);
   border-radius: 1rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

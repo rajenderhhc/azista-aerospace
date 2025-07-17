@@ -24,6 +24,8 @@ const StationSummary = () => {
     stationId = "",
     profileId = 0,
     district = "",
+    stationEnvDataList,
+    profileName,
   } = location?.state?.station || {};
 
   const navigate = useNavigate();
@@ -97,46 +99,37 @@ const StationSummary = () => {
         stationId,
         profileId,
         district,
-        stationData,
+        stationData: { ...stationData, profileName },
       },
     });
   };
 
   return (
     <section className="mainContInfo">
-      <StationView stationData={stationData} district={district} />
+      <StationView
+        stationData={{ ...stationData, profileName }}
+        district={district}
+      />
       <div className="row">
         <div className="col-sm-12 ">
           <div className="live-weather-sec">
             <div className="d-flex flex-column flex-md-row justify-content-md-between mb-2">
               <h6 className="section-heading">Live Weather</h6>
               <div className="d-flex align-items-center">
+                <span> Showing Data of: {stationData.lastRefreshTime}</span>
                 <span
                   className="mx-md-3 me-2 detail-view-btn"
                   onClick={navigetDetailsPage}
                 >
                   Detailed View
                 </span>
-                {/* {stationData.lastRefreshTime} */}
+
                 <span
                   className="side-heading"
                   onClick={() => getStationSummary(stationId, profileId)}
                 >
                   <TfiReload className="ms-2" />
                 </span>
-                {/* <span className='side-heading'>
-                  Showing Data of:
-                  <span
-                    style={{
-                      fontWeight: '700',
-                      margin: '0 0.2rem',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => getStationSummary(stationId, profileId)}>
-                    {getLastDataUpdated(stationData.lastRefreshTime)}
-                    <TfiReload className='ms-2' />
-                  </span>
-                </span> */}
               </div>
             </div>
             <div className="row">
@@ -197,7 +190,7 @@ const StationSummary = () => {
 
         <div className="col-sm-12">
           <div className="live-weather-sec">
-            <PipeLineGraph />
+            <PipeLineGraph defaultParamerts={Object.keys(stationEnvDataList)} />
           </div>
         </div>
       </div>

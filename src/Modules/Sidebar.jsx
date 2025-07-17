@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import ErrorHandler from "../utils/errorhandler";
 import { MdKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import azista from "../images/azista.png";
+import rajstanlogo from "../images/Rajasthan_state_logo.png";
 import locationIcon from "../images/location-icon.png";
 import { AiOutlineSearch } from "react-icons/ai";
 import { Link } from "react-router-dom";
@@ -13,11 +14,15 @@ import { ThreeDot } from "react-loading-indicators";
 import { IoIosClose } from "react-icons/io";
 import "./Custom.css";
 import "./dashboard.css";
+import { useStationProfile } from "../context/stationContext";
+import { PROFILES_COLORS } from "../utils/profiles";
 
 const Sidebar = ({ toggleSidebar, showSidebar }) => {
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const token_key = process.env.REACT_APP_JWT_TOKEN;
   const admin_key = process.env.REACT_APP_ADMIN_KEY;
+
+  const { isRjProfile } = useStationProfile();
 
   const userData = useMemo(() => {
     try {
@@ -152,7 +157,10 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
           <div className="customDropdown-continer">
             <img src={locationIcon} alt="location" className="nav-icons" />
             <p className="w-75 text-start mb-0">{profileName}</p>
-            <p className="profile-count ms-1 mb-0">
+            <p
+              className="profile-count ms-1 mb-0"
+              style={{ background: PROFILES_COLORS[profileName] }}
+            >
               {stationCount > 99 ? "99+" : stationCount}
             </p>
           </div>
@@ -170,7 +178,11 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
                 <ThreeDot color="#f58142" size="small" />
               </div>
             ) : stationsList.length > 0 ? (
-              <StationOverView stations={stationsList} activeEffect={true} />
+              <StationOverView
+                stations={stationsList}
+                profileName={profileName}
+                activeEffect={true}
+              />
             ) : (
               <div className="text-center">
                 <span className="text-danger">No Data found</span>
@@ -189,7 +201,11 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
       </div>
       <div className="logo text-center">
         <Link to="/">
-          <img src={azista} alt="Azista" className="nav-logo" />
+          <img
+            src={isRjProfile ? rajstanlogo : azista}
+            alt="Azista"
+            className="nav-logo"
+          />
         </Link>
       </div>
       <div className="search-bar">
