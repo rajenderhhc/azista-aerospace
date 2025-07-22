@@ -30,6 +30,7 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
       return {};
     }
   }, [admin_key]);
+
   const { profileDetailsList = [] } = userData || {};
 
   const [profileStations, setProfileStations] = useState([]);
@@ -162,7 +163,6 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
       >
         <button onClick={handleProfileClick} className="customDropdown">
           <div className="customDropdown-continer">
-            {/* locationIcon */}
             <img
               src={profileIcon || locationIcon}
               alt="location"
@@ -173,11 +173,10 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
             </p>
             <p
               className="profile-count ms-1 mb-0"
-              style={{ background: profileColor }}
+              style={{ background: profileColor || "red" }}
             >
               {stationCount > 99 ? "99+" : stationCount}
             </p>
-            {/* PROFILES_COLORS[profileName] */}
           </div>
           {isOpen ? (
             <MdKeyboardArrowUp className="d-block" size={18} />
