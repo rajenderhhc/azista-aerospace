@@ -89,7 +89,7 @@ const Login = () => {
 
     // Add actual API call for resetting password here
     alert(`Resetting password..., ${newPassword}`);
-    console.log("Resetting password...", newPassword);
+
 
     setResetPasswords({ newPassword: "", confirmPassword: "" });
     setView("login");
@@ -100,8 +100,7 @@ const Login = () => {
     const { emailAddress } = userData;
     if (!validateEmail(emailAddress))
       return setErrorMessage("Enter a valid email.");
-    // Add actual API call to request reset link here
-    //  rajani.babariya@azistaaerospace.com
+ 
     try {
       const formData = new FormData();
       formData.append("emailAddress", emailAddress);
@@ -110,7 +109,7 @@ const Login = () => {
         `${baseUrl}/UserAuthenticate/ForgotPassword`,
         formData
       );
-      console.log(data, "restepassword");
+ 
       ErrorHandler.onLoadingClose();
 
       const { message, result, statusCode } = data;
@@ -121,7 +120,6 @@ const Login = () => {
         setUserData({ emailAddress: "", password: "" });
         ErrorHandler.onSuccess(result);
       } else if (statusCode === 204) {
-        //ErrorHandler.onSuccess(message);
         setErrorMessage(message);
       }
     } catch (error) {
@@ -200,8 +198,7 @@ const Login = () => {
           <form onSubmit={onSubmitResetRequest} className="w-100 text-center">
             <h5 className="my-1">Reset Password</h5>
             <small className="mb-3 d-block">
-              Enter your registered email address to receive a new
-              password.
+              Enter your registered email address to receive a new password.
             </small>
             <div className="form-floating w-100 mb-4">
               <input

@@ -154,8 +154,8 @@ const MapEmbed = ({
           </BaseLayer>
         </LayersControl>
         {locations.map((loc, i) => {
-          console.log(loc, "map loc");
           const [lat, lon] = getValidCoordinates(loc.latitude, loc.longitude);
+
           return (
             <Marker
               key={loc.stationId || i}
