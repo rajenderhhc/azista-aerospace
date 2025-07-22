@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import Azistalogo from "../../images/Azista-logo.png";
+import Azistalogo from "../../images/Emblem_Rajasthan.png";
 import ErrorHandler from "../../utils/errorhandler";
 import "./login.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -153,7 +153,7 @@ const Login = () => {
                 placeholder="name@example.com"
                 autoComplete="email"
               />
-              <label htmlFor="emailAddress">User Name / Email Address</label>
+              <label htmlFor="emailAddress">Email Address</label>
             </div>
 
             <div className="password-cont w-100">
@@ -200,8 +200,8 @@ const Login = () => {
           <form onSubmit={onSubmitResetRequest} className="w-100 text-center">
             <h5 className="my-1">Reset Password</h5>
             <small className="mb-3 d-block">
-              Enter your registered email address to <br /> receive a new
-              password your password.
+              Enter your registered email address to receive a new
+              password.
             </small>
             <div className="form-floating w-100 mb-4">
               <input
@@ -214,7 +214,7 @@ const Login = () => {
                 onChange={(e) => handleInputChange(e, setUserData)}
                 placeholder="name@example.com"
               />
-              <label htmlFor="emailAddress">User Name / Email Address</label>
+              <label htmlFor="emailAddress">Email Address</label>
             </div>
 
             <div className="my-4 w-100">
