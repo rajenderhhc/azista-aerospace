@@ -190,7 +190,7 @@ const Login = () => {
                 className="text-center d-block mt-2"
                 style={{ cursor: "pointer" }}
               >
-                Reset Password?
+                Forget Password?
               </small>
             </div>
           </form>
@@ -200,8 +200,8 @@ const Login = () => {
           <form onSubmit={onSubmitResetRequest} className="w-100 text-center">
             <h5 className="my-1">Reset Password</h5>
             <small className="mb-3 d-block">
-              Enter your registered email address to <br /> receive a link to
-              reset your password.
+              Enter your registered email address to <br /> receive a new
+              password your password.
             </small>
             <div className="form-floating w-100 mb-4">
               <input
@@ -223,7 +223,7 @@ const Login = () => {
                 style={{ fontWeight: "600", fontSize: "medium" }}
                 className="btn btn-light btn-lg btn-block w-100 btn-outline-primary"
               >
-                Submit
+                Forget Password
               </button>
               <small
                 onClick={() => setView("login")}

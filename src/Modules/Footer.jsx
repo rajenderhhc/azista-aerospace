@@ -17,7 +17,9 @@ const Footer = ({ showSidebar }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {isRjProfile ? "Maintain by azistaindustries" : "Azistaindustries"}
+          {isRjProfile
+            ? "Maintain by Azista Industries Pvt. Ltd."
+            : "Azista Industries Pvt. Ltd."}
         </a>
       </div>
     </footer>

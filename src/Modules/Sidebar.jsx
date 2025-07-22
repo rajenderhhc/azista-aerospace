@@ -5,7 +5,7 @@ import ErrorHandler from "../utils/errorhandler";
 import { MdKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import azista from "../images/azista.png";
 import rajstanlogo from "../images/Emblem_Rajasthan.png";
-//import locationIcon from "../images/location-icon.png";
+import locationIcon from "../images/location-icon.png";
 import { AiOutlineSearch } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
@@ -163,7 +163,11 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
         <button onClick={handleProfileClick} className="customDropdown">
           <div className="customDropdown-continer">
             {/* locationIcon */}
-            <img src={profileIcon} alt="location" className="nav-icons" />
+            <img
+              src={profileIcon || locationIcon}
+              alt="location"
+              className="nav-icons"
+            />
             <p className="w-75 text-start mb-0" style={{ color: profileColor }}>
               {profileName}
             </p>

@@ -44,6 +44,8 @@ const Home = () => {
     getMyStations();
   }, [getMyStations]);
 
+  console.log(locations);
+
   return (
     <div className="mainContInfo">
       {locations.length > 0 ? (

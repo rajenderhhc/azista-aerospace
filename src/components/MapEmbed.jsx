@@ -107,20 +107,20 @@ const MapEmbed = ({
   };
 
   const createCustomIcon = (isActive, profileIcon, profileColor) => {
-    // const color = isActive ? "#000000" : profileColor || "#2e8ff7ff";
+    const color = isActive ? "#000000" : profileColor || "#2e8ff7ff";
 
-    //   const svgIcon = `
-    //   <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">
-    //     <path fill="${color}" d="M12.5 0C5.6 0 0 5.6 0 12.5 0 22.2 12.5 41 12.5 41S25 22.2 25 12.5C25 5.6 19.4 0 12.5 0z"/>
-    //     <circle cx="13" cy="13" r="4" fill="white"/>
-    //   </svg>
-    // `;
+    const svgIcon = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">
+        <path fill="${color}" d="M12.5 0C5.6 0 0 5.6 0 12.5 0 22.2 12.5 41 12.5 41S25 22.2 25 12.5C25 5.6 19.4 0 12.5 0z"/>
+        <circle cx="13" cy="13" r="4" fill="white"/>
+      </svg>
+    `;
 
-    //   const svgUrl = "data:image/svg+xml;base64," + btoa(svgIcon);
+    const svgUrl = "data:image/svg+xml;base64," + btoa(svgIcon);
 
     return new L.Icon({
-      iconUrl: profileIcon,
-      iconSize: [22, 22], //[25, 41]
+      iconUrl: profileIcon || svgUrl,
+      iconSize: profileIcon ? [22, 22] : [25, 41],
       iconAnchor: [12.5, 41],
       popupAnchor: [0, -35],
       // shadowUrl:
