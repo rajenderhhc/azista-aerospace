@@ -74,7 +74,7 @@ const SummaryReportTable = ({ data, fileName }) => {
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: hiddenTableRef.current,
-    filename: `${fileName}_${new Date().toISOString().split("T")[0]}`,
+    filename: fileName,
     sheet: `Report_${new Date().toISOString().split("T")[0]}`,
   });
 

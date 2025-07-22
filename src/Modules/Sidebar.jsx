@@ -4,8 +4,8 @@ import Cookies from "js-cookie";
 import ErrorHandler from "../utils/errorhandler";
 import { MdKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import azista from "../images/azista.png";
-import rajstanlogo from "../images/Rajasthan_state_logo.png";
-import locationIcon from "../images/location-icon.png";
+import rajstanlogo from "../images/Emblem_Rajasthan.png";
+//import locationIcon from "../images/location-icon.png";
 import { AiOutlineSearch } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
@@ -15,7 +15,6 @@ import { IoIosClose } from "react-icons/io";
 import "./Custom.css";
 import "./dashboard.css";
 import { useStationProfile } from "../context/stationContext";
-import { PROFILES_COLORS } from "../utils/profiles";
 
 const Sidebar = ({ toggleSidebar, showSidebar }) => {
   const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -115,7 +114,12 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
     return stations.reduce((acc, station) => {
       let group = acc.find((g) => g.profileName === station.profileName);
       if (!group) {
-        group = { profileName: station.profileName, stations: [] };
+        group = {
+          profileName: station.profileName,
+          profileColor: station.profileColor,
+          profileIcon: station.profileIcon,
+          stations: [],
+        };
         acc.push(group);
       }
       group.stations.push(station);
@@ -129,6 +133,9 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
       profileID = "",
       totalStations = 0,
       stations = [],
+      profileIcon,
+
+      profileColor,
     } = profile;
 
     const isOpen = isSearch
@@ -155,14 +162,18 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
       >
         <button onClick={handleProfileClick} className="customDropdown">
           <div className="customDropdown-continer">
-            <img src={locationIcon} alt="location" className="nav-icons" />
-            <p className="w-75 text-start mb-0">{profileName}</p>
+            {/* locationIcon */}
+            <img src={profileIcon} alt="location" className="nav-icons" />
+            <p className="w-75 text-start mb-0" style={{ color: profileColor }}>
+              {profileName}
+            </p>
             <p
               className="profile-count ms-1 mb-0"
-              style={{ background: PROFILES_COLORS[profileName] }}
+              style={{ background: profileColor }}
             >
               {stationCount > 99 ? "99+" : stationCount}
             </p>
+            {/* PROFILES_COLORS[profileName] */}
           </div>
           {isOpen ? (
             <MdKeyboardArrowUp className="d-block" size={18} />

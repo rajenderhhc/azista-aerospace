@@ -220,10 +220,16 @@ const StationDetails = () => {
   };
 
   const fomatedOverivewData = formatDataByDate(overviewData);
-
+  if (Object.keys(stationData).length < 1)
+    return (
+      <div className="h-100 d-flex justifiy-content-center text-center align-items-center ">
+        <p>Please select Station</p>
+      </div>
+    );
   return (
     <div className="mainContInfo mb-5">
       <StationView stationData={stationData} district={district} />
+
       <div className="d-flex justify-content-between align-items-center mt-4">
         <div className="left-sec">
           <img

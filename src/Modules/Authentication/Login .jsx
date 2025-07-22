@@ -5,7 +5,7 @@ import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import Azistalogo from "../../images/Azista-logo.png";
 import ErrorHandler from "../../utils/errorhandler";
 import "./login.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
   const [userData, setUserData] = useState({ emailAddress: "", password: "" });
@@ -15,7 +15,11 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [view, setView] = useState("login"); // "login" | "reset-request" | "reset-password"
+
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
+
+  const [view, setView] = useState(type || "login"); // "login" | "reset-request" | "reset-password"
 
   const tokenKey = process.env.REACT_APP_JWT_TOKEN || "token";
   const jwtToken = Cookies.get(tokenKey);
@@ -91,18 +95,39 @@ const Login = () => {
     setView("login");
   };
 
-  const onSubmitResetRequest = (e) => {
+  const onSubmitResetRequest = async (e) => {
     e.preventDefault();
     const { emailAddress } = userData;
     if (!validateEmail(emailAddress))
       return setErrorMessage("Enter a valid email.");
     // Add actual API call to request reset link here
-    alert("Requesting password reset for:", emailAddress);
-    console.log(`Requesting password reset for: ${emailAddress}`);
+    //  rajani.babariya@azistaaerospace.com
+    try {
+      const formData = new FormData();
+      formData.append("emailAddress", emailAddress);
+      ErrorHandler.onLoading();
+      const { data } = await axios.post(
+        `${baseUrl}/UserAuthenticate/ForgotPassword`,
+        formData
+      );
+      console.log(data, "restepassword");
+      ErrorHandler.onLoadingClose();
 
-    setShowPassword(false);
-    setView("reset-password");
-    setUserData({ emailAddress: "", password: "" });
+      const { message, result, statusCode } = data;
+
+      if (statusCode === 200) {
+        setShowPassword(false);
+        setView("login");
+        setUserData({ emailAddress: "", password: "" });
+        ErrorHandler.onSuccess(result);
+      } else if (statusCode === 204) {
+        //ErrorHandler.onSuccess(message);
+        setErrorMessage(message);
+      }
+    } catch (error) {
+      ErrorHandler.onLoadingClose();
+      setErrorMessage(ErrorHandler.errMsg(error));
+    }
   };
 
   const handleKeyDown = (e) => e.key === "Enter" && onSubmitLogin();

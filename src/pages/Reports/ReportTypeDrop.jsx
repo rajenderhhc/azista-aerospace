@@ -16,8 +16,6 @@ const ReportTypeDrop = ({
   ];
 
   const onChangeReportType = (selectedOption) => {
-    setReportsData([]);
-    setShowNodata(false);
     setReportType(selectedOption ? selectedOption.value : "gn");
   };
 

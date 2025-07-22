@@ -11,10 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  getDummySensorData,
-  getSensorColor,
-} from "../../utils/sensorsFormater";
+import { getSensorColor } from "../../utils/sensorsFormater";
 
 import "../dashboard.css";
 
@@ -139,7 +136,11 @@ const LineChartContainer = (props) => {
                 type="monotone"
                 dataKey="current"
                 name={sensorName}
-                stroke={getSensorColor(sensorName) || "#4CAF50"}
+                stroke={
+                  getSensorColor(
+                    sensorName.replace(/\s*\(.*?\)/g, "").trim()
+                  ) || "#4CAF50"
+                }
                 dot={{ r: 5 }}
                 strokeWidth={2}
               />

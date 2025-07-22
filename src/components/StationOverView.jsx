@@ -70,7 +70,10 @@ const StationOverView = (props) => {
               className={`station-weather-report ${isActiveTab}`}
               onClick={() => goToSummary(station)}
             >
-              <span className={`stationName ${isActiveTab}`}>
+              <span
+                className={`stationName ${isActiveTab}`}
+                style={{ minWidth: activeEffect ? "auto" : "20rem" }}
+              >
                 {station.stationName} - {station.stationId}
               </span>
               <span className="profileName">
@@ -88,7 +91,7 @@ const StationOverView = (props) => {
                 {Object.keys(station?.stationEnvDataList).map((key) => (
                   <div
                     key={key}
-                    className="d-flex flex-column align-items-center"
+                    className="d-flex flex-column align-items-center mx-1"
                   >
                     {getSensorIcon(key) ? (
                       <img

@@ -162,7 +162,14 @@ const Reports = () => {
         const profile = profileDetailsList.find(
           (p) => p.profileID === selectedProfile
         );
-        setFileName(`${profile?.profileID}-${subPath}`);
+        const now = new Date();
+        const formattedDate = now
+          .toLocaleDateString("en-GB")
+          .replace(/\//g, "-");
+
+        setFileName(
+          `${subPath}_${profile?.profileName || ""}_${formattedDate}`
+        );
       } else {
         ErrorHandler.onError({ message: data.message || "Unknown error" });
       }
@@ -225,6 +232,21 @@ const Reports = () => {
     }
   };
 
+  const onChangeReportType = (selectedOption) => {
+    setReportsData([]);
+    setShowNodata(false);
+    onChangeTime([]);
+    setSelectedDate(dayjs());
+    setFilterType("c");
+    setSelectedStations([]);
+    setReportType(selectedOption);
+  };
+
+  useEffect(() => {
+    onChangeTime([]);
+    setSelectedDate(dayjs());
+  }, [filterType]);
+
   return (
     <div className="mainContInfo">
       <h5 className="report-title">Reports</h5>
@@ -233,7 +255,7 @@ const Reports = () => {
           <div className="col-12 col-md-3 mb-2">
             <ReportTypeDrop
               reportType={reportType}
-              setReportType={setReportType}
+              setReportType={onChangeReportType}
               setReportsData={setReportsData}
               setShowNodata={setShowNodata}
             />

@@ -12,18 +12,7 @@ export const StationProfileProvider = ({ children }) => {
     sessionStorage.getItem("activeprofileId") || ""
   );
 
-  const userData = JSON.parse(
-    localStorage.getItem(process.env.REACT_APP_ADMIN_KEY)
-  );
-  const { profileDetailsList } = userData;
-
-  const showReportType = () => {
-    return profileDetailsList.some((p) =>
-      p.profileName.toLowerCase().includes("nhp-rj")
-    );
-  };
-
-  const isRjProfile = showReportType();
+  const [isRjProfile, setIsRjProfile] = useState(false);
 
   return (
     <StationProfileContext.Provider
@@ -33,6 +22,7 @@ export const StationProfileProvider = ({ children }) => {
         activeProfileId,
         setActiveProfileId,
         isRjProfile,
+        setIsRjProfile,
       }}
     >
       {children}

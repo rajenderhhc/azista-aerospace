@@ -42,11 +42,7 @@ const StationView = ({ stationData, district }) => {
       </div>
 
       <div className="col-md-8 col-xl-9">
-        <MapEmbed
-          locations={[{ ...stationData }]}
-          height={"13.6rem"}
-          Zoom={5}
-        />
+        <MapEmbed locations={[stationData]} height={"13.6rem"} Zoom={5} />
       </div>
 
       <div className="col-sm-12 col-md-4 col-xl-3 mt-3 mt-md-0 d-flex justify-content-md-end">
