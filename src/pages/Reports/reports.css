@@ -33,7 +33,7 @@
 .summary-table-container {
   max-height: 52vh;
   overflow: auto;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 /* Apply this on mobile screens (<= 765px width) */

@@ -90,7 +90,6 @@ const Login = () => {
     // Add actual API call for resetting password here
     alert(`Resetting password..., ${newPassword}`);
 
-
     setResetPasswords({ newPassword: "", confirmPassword: "" });
     setView("login");
   };
@@ -100,7 +99,7 @@ const Login = () => {
     const { emailAddress } = userData;
     if (!validateEmail(emailAddress))
       return setErrorMessage("Enter a valid email.");
- 
+
     try {
       const formData = new FormData();
       formData.append("emailAddress", emailAddress);
@@ -109,7 +108,7 @@ const Login = () => {
         `${baseUrl}/UserAuthenticate/ForgotPassword`,
         formData
       );
- 
+
       ErrorHandler.onLoadingClose();
 
       const { message, result, statusCode } = data;
@@ -129,6 +128,11 @@ const Login = () => {
   };
 
   const handleKeyDown = (e) => e.key === "Enter" && onSubmitLogin();
+
+  const onHandleChangeViewType = (type) => {
+    setView(type);
+    setErrorMessage("");
+  };
 
   return (
     <div className="bg-image">
@@ -184,7 +188,7 @@ const Login = () => {
                 LOG IN
               </button>
               <small
-                onClick={() => setView("reset-request")}
+                onClick={() => onHandleChangeViewType("reset-request")}
                 className="text-center d-block mt-2"
                 style={{ cursor: "pointer" }}
               >
@@ -223,7 +227,7 @@ const Login = () => {
                 Forget Password
               </button>
               <small
-                onClick={() => setView("login")}
+                onClick={() => onHandleChangeViewType("login")}
                 className="text-center d-block mt-2"
                 style={{ cursor: "pointer" }}
               >
@@ -282,7 +286,7 @@ const Login = () => {
                 Reset Password & Log In
               </button>
               <small
-                onClick={() => setView("login")}
+                onClick={() => onHandleChangeViewType("login")}
                 className="text-center d-block mt-2"
                 style={{ cursor: "pointer" }}
               >

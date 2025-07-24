@@ -97,10 +97,92 @@ const SummaryReportTable = ({ data, fileName }) => {
       </tr>
     );
 
+  // const renderHeaderRows = () => {
+  //   const firstRowHeaders = [];
+  //   const secondRowHeaders = [];
+
+  //   Object.entries(groupedHeaders).forEach(([key, fields]) => {
+  //     const isFlat = key.startsWith("dynamicFileds.");
+  //     const isNested = fields.some((f) => f.label !== key);
+
+  //     if (isFlat) {
+  //       // Render each dynamic field directly
+  //       fields.forEach(({ label, path }) => {
+  //         firstRowHeaders.push(
+  //           <th
+  //             key={path}
+  //             scope="col"
+  //             className="border px-2 py-1 bg-gray-100 whitespace-normal"
+  //             rowSpan={2}
+  //           >
+  //             {camelToTitle(label)
+  //               .split("\n")
+  //               .map((line, i) => (
+  //                 <div key={i} className="block">
+  //                   {line}
+  //                 </div>
+  //               ))}
+  //           </th>
+  //           // <th
+  //           //   key={path}
+  //           //   scope="col"
+  //           //   className="border px-2 py-1 bg-gray-100"
+  //           //   rowSpan={2}
+  //           // >
+  //           //   {camelToTitle(label)}
+  //           // </th>
+  //         );
+  //       });
+  //     } else {
+  //       firstRowHeaders.push(
+  //         <th
+  //           scope="col"
+  //           key={key}
+  //           colSpan={isNested ? fields.length : 1}
+  //           rowSpan={isNested ? 1 : 2}
+  //           className={`border px-2 py-1 bg-gray-100 ${
+  //             isNested ? "text-center" : ""
+  //           }`}
+  //         >
+  //           {camelToTitle(key)}
+  //         </th>
+  //       );
+
+  //       if (isNested) {
+  //         fields.forEach(({ label, path }) => {
+  //           secondRowHeaders.push(
+  //             <th
+  //               scope="col"
+  //               key={path}
+  //               className="border px-2 py-1 bg-gray-50"
+  //             >
+  //               {camelToTitle(label)}
+  //             </th>
+  //           );
+  //         });
+  //       }
+  //     }
+  //   });
+
+  //   return (
+  //     <>
+  //       <tr>{firstRowHeaders}</tr>
+  //       {secondRowHeaders.length > 0 && <tr>{secondRowHeaders}</tr>}
+  //     </>
+  //   );
+  // };
+
+  const renderMultilineHeader = (text) =>
+    text.split("\n").map((line, i) => (
+      <div key={i} className="block">
+        {line}
+      </div>
+    ));
+
   const renderHeaderRows = () => {
     const firstRowHeaders = [];
-    const secondRowHeaders = [];
 
+    const secondRowHeaders = [];
     Object.entries(groupedHeaders).forEach(([key, fields]) => {
       const isFlat = key.startsWith("dynamicFileds.");
       const isNested = fields.some((f) => f.label !== key);
@@ -112,25 +194,25 @@ const SummaryReportTable = ({ data, fileName }) => {
             <th
               key={path}
               scope="col"
-              className="border px-2 py-1 bg-gray-100"
+              className="border px-2 py-1 bg-gray-100 whitespace-normal"
               rowSpan={2}
             >
-              {camelToTitle(label)}
+              {renderMultilineHeader(camelToTitle(label))}
             </th>
           );
         });
       } else {
         firstRowHeaders.push(
           <th
-            scope="col"
             key={key}
-            colSpan={isNested ? fields.length : 1}
-            rowSpan={isNested ? 1 : 2}
-            className={`border px-2 py-1 bg-gray-100 ${
+            scope="col"
+            className={`border px-2 py-1 bg-gray-100 whitespace-normal ${
               isNested ? "text-center" : ""
             }`}
+            colSpan={isNested ? fields.length : 1}
+            rowSpan={isNested ? 1 : 2}
           >
-            {camelToTitle(key)}
+            {renderMultilineHeader(camelToTitle(key))}
           </th>
         );
 
@@ -138,11 +220,11 @@ const SummaryReportTable = ({ data, fileName }) => {
           fields.forEach(({ label, path }) => {
             secondRowHeaders.push(
               <th
-                scope="col"
                 key={path}
-                className="border px-2 py-1 bg-gray-50"
+                scope="col"
+                className="border px-2 py-1 bg-gray-100 whitespace-normal"
               >
-                {camelToTitle(label)}
+                {renderMultilineHeader(camelToTitle(label))}
               </th>
             );
           });

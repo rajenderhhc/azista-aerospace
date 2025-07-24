@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 
 import Sidebar from "./Sidebar";
@@ -16,16 +16,18 @@ const MainLayout = () => {
     localStorage.getItem(process.env.REACT_APP_ADMIN_KEY)
   );
 
-  const { profileDetailsList } = userData;
+  const { profileDetailsList = [] } = userData;
 
-  const showReportType = () => {
-    return profileDetailsList.some((p) =>
-      p.profileName.toLowerCase().includes("nhp-rj")
-    );
-  };
+  useEffect(() => {
+    const showReportType = () => {
+      return profileDetailsList.some((p) =>
+        p.profileName.toLowerCase().includes("nhp-rj")
+      );
+    };
 
-  const isRjProfile = showReportType();
-  setIsRjProfile(isRjProfile);
+    const isRjProfile = showReportType();
+    setIsRjProfile(isRjProfile);
+  }, [profileDetailsList, setIsRjProfile]);
 
   return (
     <div className="webpage">

@@ -172,7 +172,7 @@ const Sidebar = ({ toggleSidebar, showSidebar }) => {
               {profileName}
             </p>
             <p
-              className="profile-count ms-1 mb-0"
+              className="profile-count ms-auto ms-1 mb-0"
               style={{ background: profileColor || "red" }}
             >
               {stationCount > 99 ? "99+" : stationCount}

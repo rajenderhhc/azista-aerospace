@@ -100,7 +100,7 @@ const NavbarModule = ({ toggleSidebar, showSidebar }) => {
           <Navbar.Brand onClick={handleSidebar} className="fabar">
             <FaBars />
           </Navbar.Brand>
-          {/* <Navbar.Toggle aria-controls='basic-navbar-nav' /> */}
+
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto navItemsCont">
               <Tooltip title={"Home"}>
